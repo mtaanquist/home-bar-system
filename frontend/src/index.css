@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Test CSS */
+.fallback-test {
+  background-color: red !important;
+  color: white !important;
+  padding: 16px !important;
+  margin: 16px 0 !important;
+}
