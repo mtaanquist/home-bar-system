@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Clock, CheckCircle, XCircle, Coffee, Check } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
+import { useSessionManager } from "../hooks/useSessionManager";
 
 const CustomerInterface: React.FC = () => {
   const {
@@ -11,8 +12,6 @@ const CustomerInterface: React.FC = () => {
     loading,
     drinks,
     orders,
-    setCurrentView,
-    setCustomerName,
     setDrinks,
     setOrders,
     setViewingRecipe,
@@ -22,6 +21,10 @@ const CustomerInterface: React.FC = () => {
   } = useApp();
 
   const t = useTranslation(language);
+  const { clearSession } = useSessionManager();
+
+  // Modal state for order placed
+  const [showOrderPlacedModal, setShowOrderPlacedModal] = useState(false);
 
   // Data fetching
   const fetchDrinks = async () => {
@@ -78,7 +81,7 @@ const CustomerInterface: React.FC = () => {
         }),
       });
 
-      alert(t("orderPlaced"));
+      setShowOrderPlacedModal(true); // Show modal instead of alert
       await fetchOrders();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to place order");
@@ -121,6 +124,22 @@ const CustomerInterface: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Order Placed Modal */}
+      {showOrderPlacedModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+            <div className="text-3xl mb-2">🎉</div>
+            <h2 className="text-lg font-bold mb-2">{t("orderPlaced")}</h2>
+            <p className="mb-4 text-gray-600">Your order has been placed!</p>
+            <button
+              onClick={() => setShowOrderPlacedModal(false)}
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
@@ -132,10 +151,7 @@ const CustomerInterface: React.FC = () => {
               <p className="text-sm text-gray-600">Welcome, {customerName}!</p>
             </div>
             <button
-              onClick={() => {
-                setCurrentView("landing");
-                setCustomerName("");
-              }}
+              onClick={clearSession}
               className="text-gray-600 hover:text-gray-800 text-sm font-medium"
             >
               {t("logout")}

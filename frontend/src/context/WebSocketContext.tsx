@@ -24,7 +24,8 @@ export const useWebSocket = () => {
   return context;
 };
 
-const WS_URL = `ws://${window.location.hostname}:8080`;
+// Use the correct host port for WebSocket when running via Docker Compose
+const WS_URL = `ws://${window.location.hostname}:21080`;
 
 export const WebSocketProvider: React.FC<{ children: ReactNode }> = ({
   children,

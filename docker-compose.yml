@@ -1,12 +1,11 @@
-version: "3.8"
 services:
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-      - "8080:8080"
+      - "21030:3000"
+      - "21080:8080"
     volumes:
       - ./data:/app/data
       - ./uploads:/app/uploads
@@ -23,7 +22,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "21000:80"
     depends_on:
       - backend
 

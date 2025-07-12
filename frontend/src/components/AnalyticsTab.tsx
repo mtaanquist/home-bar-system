@@ -1,12 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  BarChart3,
-  TrendingUp,
-  Users,
-  Coffee,
-  Clock,
-  Star,
-} from "lucide-react";
+import { BarChart3, TrendingUp, Coffee, Clock, Star } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
 

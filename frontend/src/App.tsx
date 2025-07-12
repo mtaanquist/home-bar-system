@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import LandingPage from "./components/LandingPage";
 import BartenderDashboard from "./components/BartenderDashboard";
 import CustomerInterface from "./components/CustomerInterface";
@@ -11,15 +11,9 @@ import { WebSocketProvider } from "./context/WebSocketContext";
 const AppContent: React.FC = () => {
   const {
     currentView,
-    userType,
-    currentBar,
-    customerName,
     error,
     editingDrink,
     viewingRecipe,
-    setCurrentView,
-    setUserType,
-    setCustomerName,
     setError,
     setEditingDrink,
     setViewingRecipe,

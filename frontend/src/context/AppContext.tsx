@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
 // Types
 export interface Bar {
@@ -110,17 +116,108 @@ export const useApp = () => {
 
 const API_BASE = "/api";
 
+const STORAGE_KEYS = {
+  currentView: "homeBarSystem_currentView",
+  userType: "homeBarSystem_userType",
+  currentBar: "homeBarSystem_currentBar",
+  customerName: "homeBarSystem_customerName",
+  language: "homeBarSystem_language",
+  currentTab: "homeBarSystem_currentTab",
+};
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  // App state
-  const [currentView, setCurrentView] = useState<
+  // Initialize state from localStorage if available
+  const loadFromStorage = <T,>(key: string, defaultValue: T): T => {
+    const storedValue = localStorage.getItem(key);
+    return storedValue ? JSON.parse(storedValue) : defaultValue;
+  };
+
+  const saveToStorage = <T,>(key: string, value: T) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error(`Failed to save ${key} to localStorage`, error);
+    }
+  };
+
+  // App state with initial values from localStorage
+  const [currentView, setCurrentViewState] = useState<
     "landing" | "bartender" | "customer"
-  >("landing");
-  const [userType, setUserType] = useState<"bartender" | "guest" | null>(null);
-  const [currentBar, setCurrentBar] = useState<Bar | null>(null);
-  const [customerName, setCustomerName] = useState("");
-  const [language, setLanguage] = useState<"en" | "da">("en");
+  >(() => loadFromStorage(STORAGE_KEYS.currentView, "landing"));
+
+  const [userType, setUserTypeState] = useState<"bartender" | "guest" | null>(
+    () => loadFromStorage(STORAGE_KEYS.userType, null)
+  );
+
+  const [currentBar, setCurrentBarState] = useState<Bar | null>(() =>
+    loadFromStorage(STORAGE_KEYS.currentBar, null)
+  );
+
+  const [customerName, setCustomerNameState] = useState(() =>
+    loadFromStorage(STORAGE_KEYS.customerName, "")
+  );
+
+  const [language, setLanguageState] = useState<"en" | "da">(() =>
+    loadFromStorage(STORAGE_KEYS.language, "en")
+  );
+
+  const [currentTab, setCurrentTabState] = useState<
+    "orders" | "menu" | "analytics"
+  >(() => loadFromStorage(STORAGE_KEYS.currentTab, "orders"));
+
+  // Wrapper functions that save to storage
+  const setCurrentView = (view: "landing" | "bartender" | "customer") => {
+    setCurrentViewState(view);
+    if (view === "landing") {
+      // Clear session when going back to landing
+      localStorage.removeItem(STORAGE_KEYS.currentView);
+      localStorage.removeItem(STORAGE_KEYS.userType);
+      localStorage.removeItem(STORAGE_KEYS.currentBar);
+      localStorage.removeItem(STORAGE_KEYS.customerName);
+      localStorage.removeItem(STORAGE_KEYS.currentTab);
+    } else {
+      saveToStorage(STORAGE_KEYS.currentView, view);
+    }
+  };
+
+  const setUserType = (type: "bartender" | "guest" | null) => {
+    setUserTypeState(type);
+    if (type === null) {
+      localStorage.removeItem(STORAGE_KEYS.userType);
+    } else {
+      saveToStorage(STORAGE_KEYS.userType, type);
+    }
+  };
+
+  const setCurrentBar = (bar: Bar | null) => {
+    setCurrentBarState(bar);
+    if (bar === null) {
+      localStorage.removeItem(STORAGE_KEYS.currentBar);
+    } else {
+      saveToStorage(STORAGE_KEYS.currentBar, bar);
+    }
+  };
+
+  const setCustomerName = (name: string) => {
+    setCustomerNameState(name);
+    if (name === "") {
+      localStorage.removeItem(STORAGE_KEYS.customerName);
+    } else {
+      saveToStorage(STORAGE_KEYS.customerName, name);
+    }
+  };
+
+  const setLanguage = (lang: "en" | "da") => {
+    setLanguageState(lang);
+    saveToStorage(STORAGE_KEYS.language, lang);
+  };
+
+  const setCurrentTab = (tab: "orders" | "menu" | "analytics") => {
+    setCurrentTabState(tab);
+    saveToStorage(STORAGE_KEYS.currentTab, tab);
+  };
 
   // Loading and error states
   const [loading, setLoading] = useState(false);
@@ -144,9 +241,35 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   const [editingDrink, setEditingDrink] = useState<Drink | {} | null>(null);
   const [viewingRecipe, setViewingRecipe] = useState<Drink | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [currentTab, setCurrentTab] = useState<"orders" | "menu" | "analytics">(
-    "orders"
-  );
+
+  // Session validation effect
+  useEffect(() => {
+    const validateSession = () => {
+      // If we have a view and userType but no currentBar, reset session
+      if (
+        (currentView === "bartender" || currentView === "customer") &&
+        !currentBar
+      ) {
+        console.log("Invalid session detected, resetting...");
+        setCurrentView("landing");
+        setUserType(null);
+        setCurrentBar(null);
+        setCustomerName("");
+        return;
+      }
+
+      // If we have customer view but no customer name, reset
+      if (currentView === "customer" && userType === "guest" && !customerName) {
+        console.log("Customer session without name, resetting...");
+        setCurrentView("landing");
+        setUserType(null);
+        setCurrentBar(null);
+        return;
+      }
+    };
+
+    validateSession();
+  }, [currentView, userType, currentBar, customerName]);
 
   // API helper function
   const apiCall = async (endpoint: string, options: RequestInit = {}) => {

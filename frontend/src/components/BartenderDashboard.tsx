@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Plus } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
+import { useSessionManager } from "../hooks/useSessionManager";
 import OrdersTab from "./OrdersTab";
 import MenuTab from "./MenuTab";
 import AnalyticsTab from "./AnalyticsTab";
@@ -13,8 +14,6 @@ const BartenderDashboard: React.FC = () => {
     language,
     orders,
     setCurrentTab,
-    setCurrentView,
-    setUserType,
     setDrinks,
     setOrders,
     setAnalytics,
@@ -23,6 +22,7 @@ const BartenderDashboard: React.FC = () => {
   } = useApp();
 
   const t = useTranslation(language);
+  const { clearSession } = useSessionManager();
 
   // Data fetching functions
   const fetchDrinks = async () => {
@@ -83,10 +83,7 @@ const BartenderDashboard: React.FC = () => {
               </span>
             </div>
             <button
-              onClick={() => {
-                setCurrentView("landing");
-                setUserType(null);
-              }}
+              onClick={clearSession}
               className="text-gray-600 hover:text-gray-800 font-medium"
             >
               {t("logout")}

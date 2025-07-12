@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Upload, Image as ImageIcon, Eye, EyeOff } from "lucide-react";
+import { X, Upload, Eye, EyeOff } from "lucide-react";
 import { useApp, Drink } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
 
