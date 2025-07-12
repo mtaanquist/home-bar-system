@@ -25,7 +25,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const server = createServer(app);
 const PORT = process.env.PORT || 3000;
-const WS_PORT = process.env.WS_PORT || 8080;
 
 // Database setup
 const DB_PATH = process.env.DB_PATH || "./data/bar.db";
@@ -129,12 +128,9 @@ app.use("/api/*", (req, res) => {
   res.status(404).json({ error: "API endpoint not found" });
 });
 
-// WebSocket setup
-const wss = new WebSocketServer({ port: WS_PORT });
-const wsHandler = setupWebSocket(wss);
-
-// Make WebSocket available to routes for broadcasting
-app.locals.wss = wsHandler;
+// WebSocket setup (attach to same HTTP server, path: /ws)
+const wss = new WebSocketServer({ server, path: "/ws" });
+setupWebSocket(wss);
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -151,7 +147,6 @@ app.use((err, req, res, next) => {
 // Start server
 server.listen(PORT, () => {
   console.log(`🍸 Bar API running on port ${PORT}`);
-  console.log(`📡 WebSocket server running on port ${WS_PORT}`);
   console.log(`📁 Database: ${path.resolve(DB_PATH)}`);
   console.log(`📁 Uploads: ${path.resolve(uploadsDir)}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
@@ -168,11 +163,6 @@ server.listen(PORT, () => {
 // Graceful shutdown
 const gracefulShutdown = (signal) => {
   console.log(`\n${signal} received. Starting graceful shutdown...`);
-
-  // Close WebSocket server
-  wss.close(() => {
-    console.log("WebSocket server closed.");
-  });
 
   // Close HTTP server
   server.close(() => {

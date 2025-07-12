@@ -24,8 +24,10 @@ export const useWebSocket = () => {
   return context;
 };
 
-// Use the correct host port for WebSocket when running via Docker Compose
-const WS_URL = `ws://${window.location.hostname}:21080`;
+// Use the correct host and protocol for WebSocket when running behind a reverse proxy
+const WS_URL = `${window.location.protocol === "https:" ? "wss" : "ws"}://${
+  window.location.host
+}/ws`;
 
 export const WebSocketProvider: React.FC<{ children: ReactNode }> = ({
   children,
