@@ -171,6 +171,18 @@ const CustomerInterface: React.FC = () => {
     }
   };
 
+  // Escape key closes Surprise Me modal
+  useEffect(() => {
+    if (!showRandomModal) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowRandomModal(false);
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [showRandomModal]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Order Placed Modal */}
