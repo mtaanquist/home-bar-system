@@ -293,21 +293,23 @@ const CustomerInterface: React.FC = () => {
 
       {/* Help Text */}
       {!customerOrder && spiritsWithDrinks.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <Coffee className="h-5 w-5 text-blue-400" />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">
-                How to order
-              </h3>
-              <div className="mt-2 text-sm text-blue-700">
-                <p>
-                  Browse the available drinks above and click "Order" to place
-                  your order. You can only have one active order at a time. Your
-                  order status will update in real-time.
-                </p>
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <Coffee className="h-5 w-5 text-blue-400" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800">
+                  How to order
+                </h3>
+                <div className="mt-2 text-sm text-blue-700">
+                  <p>
+                    Browse the available drinks above and click "Order" to place
+                    your order. You can only have one active order at a time.
+                    Your order status will update in real-time.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
