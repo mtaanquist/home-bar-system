@@ -1,4 +1,76 @@
-export const translations = {
+export interface TranslationMap {
+  // Landing page
+  welcome: string;
+  bartenderLogin: string;
+  guestLogin: string;
+  createBar: string;
+  barName: string;
+  bartenderPassword: string;
+  guestPassword: string;
+  language: string;
+  create: string;
+  login: string;
+  enterPassword: string;
+  enterName: string;
+
+  // Bartender interface
+  pendingOrders: string;
+  noPendingOrders: string;
+  markProcessed: string;
+  acceptOrder: string;
+  rejectOrder: string;
+  markReady: string;
+  drinkMenu: string;
+  addDrink: string;
+  editDrink: string;
+  deleteDrink: string;
+  toggleStock: string;
+  inStock: string;
+  outOfStock: string;
+  analytics: string;
+  popularDrinks: string;
+  peakHours: string;
+  totalOrders: string;
+  ordersToday: string;
+
+  // Drink form
+  drinkTitle: string;
+  drinkImage: string;
+  uploadImage: string;
+  or: string;
+  recipe: string;
+  save: string;
+  cancel: string;
+
+  // Customer interface
+  availableDrinks: string;
+  order: string;
+  viewRecipe: string;
+  yourOrder: string;
+  orderStatus: string;
+  new: string;
+  accepted: string;
+  rejected: string;
+  ready: string;
+  processed: string;
+  howToOrder: string;
+  howToOrderInstructions: string;
+  surpriseMe: string;
+  yourRandomDrink: string;
+  baseSpirit: string;
+  orderThis: string;
+  tryAnother: string;
+
+  // Status messages
+  oneOrderLimit: string;
+  orderPlaced: string;
+  loading: string;
+  error: string;
+  retry: string;
+  logout: string;
+}
+
+export const translations: { en: TranslationMap; da: TranslationMap } = {
   en: {
     // Landing page
     welcome: "Welcome to",
@@ -54,6 +126,14 @@ export const translations = {
     rejected: "Rejected",
     ready: "Ready",
     processed: "Processed",
+    howToOrder: "How to order",
+    howToOrderInstructions:
+      'Browse the available drinks below and click "Order" to place your order. You can only have one active order at a time. Your order status will update in real-time.',
+    surpriseMe: "Surprise Me!",
+    yourRandomDrink: "Your Random Drink",
+    baseSpirit: "Base Spirit",
+    orderThis: "Order this!",
+    tryAnother: "Try another",
 
     // Status messages
     oneOrderLimit: "You can only have one active order at a time",
@@ -118,6 +198,14 @@ export const translations = {
     rejected: "Afvist",
     ready: "Klar",
     processed: "Behandlet",
+    howToOrder: "How to order",
+    howToOrderInstructions:
+      'Browse the available drinks below and click "Order" to place your order. You can only have one active order at a time. Your order status will update in real-time.',
+    surpriseMe: "Surprise Me!",
+    yourRandomDrink: "Your Random Drink",
+    baseSpirit: "Base Spirit",
+    orderThis: "Order this!",
+    tryAnother: "Try another",
 
     // Status messages
     oneOrderLimit: "Du kan kun have én aktiv bestilling ad gangen",
@@ -129,8 +217,8 @@ export const translations = {
   },
 };
 
-export const useTranslation = (language: "en" | "da") => {
-  return (key: keyof typeof translations.en): string => {
-    return translations[language][key] || key;
-  };
-};
+export type TranslationKeys = keyof typeof translations.en;
+
+export function useTranslation(language: keyof typeof translations) {
+  return (key: TranslationKeys) => translations[language][key] || key;
+}

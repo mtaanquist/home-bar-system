@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Clock, CheckCircle, XCircle, Coffee, Check } from "lucide-react";
-import { useApp } from "../context/AppContext";
+import { useApp, Drink } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
 import { useSessionManager } from "../hooks/useSessionManager";
+import HelpText from "./HelpText";
+import DrinkCard from "./DrinkCard";
+import OrderStatusCard from "./OrderStatusCard";
+import RandomDrinkModal from "./RandomDrinkModal";
 
 const CustomerInterface: React.FC = () => {
   const {
@@ -25,6 +29,10 @@ const CustomerInterface: React.FC = () => {
 
   // Modal state for order placed
   const [showOrderPlacedModal, setShowOrderPlacedModal] = useState(false);
+
+  // State for random drink modal
+  const [randomDrink, setRandomDrink] = useState<Drink | null>(null);
+  const [showRandomModal, setShowRandomModal] = useState(false);
 
   // Data fetching
   const fetchDrinks = async () => {
@@ -85,12 +93,11 @@ const CustomerInterface: React.FC = () => {
     (spirit) => groupedDrinks[spirit] && groupedDrinks[spirit].length > 0
   );
 
-  const handlePlaceOrder = async (drink: any) => {
+  const handlePlaceOrder = async (drink: Drink) => {
     if (customerOrder) {
       alert(t("oneOrderLimit"));
       return;
     }
-
     setLoading(true);
     try {
       await apiCall("/orders", {
@@ -102,14 +109,37 @@ const CustomerInterface: React.FC = () => {
           drinkTitle: drink.title,
         }),
       });
-
-      setShowOrderPlacedModal(true); // Show modal instead of alert
+      setShowOrderPlacedModal(true);
       await fetchOrders();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to place order");
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper to get all in-stock drinks
+  const allInStockDrinks = drinks.filter((d) => d.in_stock);
+
+  const handleSurpriseMe = () => {
+    if (allInStockDrinks.length === 0) return;
+    const idx = Math.floor(Math.random() * allInStockDrinks.length);
+    setRandomDrink(allInStockDrinks[idx]);
+    setShowRandomModal(true);
+  };
+
+  const handleTryAnother = () => {
+    if (allInStockDrinks.length === 0) return;
+    let next;
+    do {
+      next =
+        allInStockDrinks[Math.floor(Math.random() * allInStockDrinks.length)];
+    } while (
+      allInStockDrinks.length > 1 &&
+      randomDrink &&
+      next.id === randomDrink.id
+    );
+    setRandomDrink(next);
   };
 
   const getStatusIcon = (status: string) => {
@@ -182,6 +212,31 @@ const CustomerInterface: React.FC = () => {
         </div>
       </div>
 
+      {/* Help Text & Surprise Me */}
+      {!customerOrder && spiritsWithDrinks.length > 0 && (
+        <HelpText
+          onSurprise={handleSurpriseMe}
+          canSurprise={allInStockDrinks.length > 0}
+          disabled={!!customerOrder || loading}
+          t={t}
+        />
+      )}
+
+      {/* Random Drink Modal */}
+      <RandomDrinkModal
+        drink={randomDrink as Drink}
+        visible={showRandomModal && !!randomDrink}
+        onOrder={() => {
+          setShowRandomModal(false);
+          if (randomDrink) handlePlaceOrder(randomDrink);
+        }}
+        onTryAnother={handleTryAnother}
+        onCancel={() => setShowRandomModal(false)}
+        loading={loading}
+        customerOrder={customerOrder}
+        t={t}
+      />
+
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6 flex">
         {/* Left-hand menu for base spirits */}
         <nav className="hidden md:block w-48 mr-6 sticky top-24 self-start">
@@ -201,30 +256,12 @@ const CustomerInterface: React.FC = () => {
         <div className="flex-1 space-y-8">
           {/* Current Order Status */}
           {customerOrder && (
-            <div
-              className={`rounded-lg border-2 p-4 ${getStatusColor(
-                customerOrder.status
-              )}`}
-            >
-              <div className="flex items-center space-x-3">
-                {getStatusIcon(customerOrder.status)}
-                <div className="flex-1">
-                  <h3 className="font-semibold">{t("yourOrder")}</h3>
-                  <p className="text-sm opacity-90">
-                    {customerOrder.drink_title}
-                  </p>
-                  <p className="text-xs opacity-75">
-                    {t("orderStatus")}: {t(customerOrder.status)}
-                  </p>
-                </div>
-                {customerOrder.status === "ready" && (
-                  <div className="text-right">
-                    <div className="text-lg font-bold">🎉</div>
-                    <div className="text-xs font-medium">Ready!</div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <OrderStatusCard
+              order={customerOrder}
+              t={t}
+              getStatusIcon={getStatusIcon}
+              getStatusColor={getStatusColor}
+            />
           )}
 
           {/* Grouped Available Drinks */}
@@ -245,44 +282,15 @@ const CustomerInterface: React.FC = () => {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {groupedDrinks[spirit].map((drink) => (
-                    <div
+                    <DrinkCard
                       key={drink.id}
-                      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-                    >
-                      {drink.image_url && (
-                        <div className="aspect-video overflow-hidden">
-                          <img
-                            src={drink.image_url}
-                            alt={drink.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
-                      <div className="p-4">
-                        <h3 className="font-semibold text-gray-800 mb-2">
-                          {drink.title}
-                        </h3>
-                        <div className="flex flex-col space-y-2">
-                          <button
-                            onClick={() => setViewingRecipe(drink)}
-                            className="w-full bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-200 transition-colors"
-                          >
-                            {t("viewRecipe")}
-                          </button>
-                          <button
-                            onClick={() => handlePlaceOrder(drink)}
-                            disabled={!!customerOrder || loading}
-                            className={`w-full py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                              customerOrder || loading
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-blue-600 text-white hover:bg-blue-700"
-                            }`}
-                          >
-                            {loading ? t("loading") : t("order")}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                      drink={drink}
+                      onViewRecipe={setViewingRecipe}
+                      onOrder={handlePlaceOrder}
+                      disabled={!!customerOrder || loading}
+                      loading={loading}
+                      t={t}
+                    />
                   ))}
                 </div>
               </section>
@@ -290,31 +298,6 @@ const CustomerInterface: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* Help Text */}
-      {!customerOrder && spiritsWithDrinks.length > 0 && (
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <Coffee className="h-5 w-5 text-blue-400" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">
-                  How to order
-                </h3>
-                <div className="mt-2 text-sm text-blue-700">
-                  <p>
-                    Browse the available drinks above and click "Order" to place
-                    your order. You can only have one active order at a time.
-                    Your order status will update in real-time.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
