@@ -136,7 +136,10 @@ const RecipeView: React.FC<RecipeViewProps> = ({ drink, onClose }) => {
           <div className="prose prose-sm text-gray-800 max-w-none">
             <MDEditor.Markdown
               source={drink.recipe}
-              style={{ background: "none", padding: 0, margin: 0 }}
+              style={{
+                // Force readable text color for markdown output
+                ["--color-fg-default" as any]: "#222",
+              }}
             />
           </div>
         </div>

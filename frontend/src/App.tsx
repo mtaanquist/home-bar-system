@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LandingPage from "./components/LandingPage";
 import BartenderDashboard from "./components/BartenderDashboard";
 import CustomerInterface from "./components/CustomerInterface";
@@ -55,6 +55,10 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  useEffect(() => {
+    document.body.setAttribute("data-color-mode", "light");
+  }, []);
+
   return (
     <AppProvider>
       <WebSocketProvider>
