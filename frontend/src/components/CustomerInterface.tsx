@@ -212,47 +212,34 @@ const CustomerInterface: React.FC = () => {
         </div>
       </div>
 
-      {/* Help Text & Surprise Me */}
-      {!customerOrder && spiritsWithDrinks.length > 0 && (
-        <HelpText
-          onSurprise={handleSurpriseMe}
-          canSurprise={allInStockDrinks.length > 0}
-          disabled={!!customerOrder || loading}
-          t={t}
-        />
-      )}
-
-      {/* Random Drink Modal */}
-      <RandomDrinkModal
-        drink={randomDrink as Drink}
-        visible={showRandomModal && !!randomDrink}
-        onOrder={() => {
-          setShowRandomModal(false);
-          if (randomDrink) handlePlaceOrder(randomDrink);
-        }}
-        onTryAnother={handleTryAnother}
-        onCancel={() => setShowRandomModal(false)}
-        loading={loading}
-        customerOrder={customerOrder}
-        t={t}
-      />
+      {/* Left-hand menu for base spirits */}
+      <nav className="hidden md:block w-48 mr-6 sticky top-24 self-start">
+        <ul className="space-y-2">
+          <li>
+            <button
+              onClick={handleSurpriseMe}
+              disabled={
+                allInStockDrinks.length === 0 || !!customerOrder || loading
+              }
+              className="w-full flex items-center justify-center px-3 py-2 mb-2 bg-pink-600 text-white rounded font-bold text-base shadow hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              🎲 {t("surpriseMe")}
+            </button>
+          </li>
+          {spiritsWithDrinks.map((spirit) => (
+            <li key={spirit}>
+              <a
+                href={`#spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
+                className="block px-3 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium"
+              >
+                {spirit}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6 flex">
-        {/* Left-hand menu for base spirits */}
-        <nav className="hidden md:block w-48 mr-6 sticky top-24 self-start">
-          <ul className="space-y-2">
-            {spiritsWithDrinks.map((spirit) => (
-              <li key={spirit}>
-                <a
-                  href={`#spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
-                  className="block px-3 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium"
-                >
-                  {spirit}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
         <div className="flex-1 space-y-8">
           {/* Current Order Status */}
           {customerOrder && (
