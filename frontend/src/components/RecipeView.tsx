@@ -132,6 +132,7 @@ const RecipeView: React.FC<RecipeViewProps> = ({ drink, onClose }) => {
 
         {/* Content */}
         <div className="p-6 lg:p-8 overflow-y-auto max-h-[50vh]">
+          {/* Ensure the markdown container uses a readable color and prose styling */}
           <div className="prose prose-sm text-gray-800 max-w-none">
             <MDEditor.Markdown
               source={drink.recipe}
