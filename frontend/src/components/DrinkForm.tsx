@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { X, Upload, Eye, EyeOff } from "lucide-react";
+import { X, Upload } from "lucide-react";
 import { useApp, Drink } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+import MDEditor from "@uiw/react-md-editor";
 
 interface DrinkFormProps {
   drink: Drink | {};
@@ -28,7 +31,6 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
     recipe: "recipe" in drink ? drink.recipe || "" : "",
   });
 
-  const [showPreview, setShowPreview] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleImageUpload = async (
@@ -126,18 +128,6 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
     }
   };
 
-  const renderMarkdown = (text: string): string => {
-    return text
-      .replace(
-        /## (.*)/g,
-        '<h2 class="text-xl font-bold mb-2 text-gray-800">$1</h2>'
-      )
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
-      .replace(/- (.*)/g, '<li class="ml-4 mb-1">• $1</li>')
-      .replace(/(\d+)\. (.*)/g, '<li class="ml-4 mb-1">$1. $2</li>')
-      .replace(/\n/g, "<br>");
-  };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
@@ -200,7 +190,7 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
                       <input
                         type="file"
                         className="hidden"
-                        accept="image/*"
+                        accept="image/png, image/jpeg, image/jpg, image/gif, image/webp, image/avif, image/svg+xml, image/bmp, image/tiff, image/x-icon, image/heic, image/heif, image/*"
                         onChange={handleImageUpload}
                         disabled={loading}
                       />
@@ -250,31 +240,20 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
                   {t("recipe")} *
                 </label>
                 <div className="relative">
-                  <textarea
+                  <MDEditor
                     value={formData.recipe}
-                    onChange={(e) =>
+                    onChange={(value) =>
                       setFormData((prev) => ({
                         ...prev,
-                        recipe: e.target.value,
+                        recipe: value || "",
                       }))
                     }
-                    rows={12}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm resize-none"
-                    placeholder="## Drink Name&#10;&#10;**Ingredients:**&#10;- 2 oz Spirit&#10;- 1 oz Mixer&#10;- Garnish&#10;&#10;**Instructions:**&#10;1. Step 1&#10;2. Step 2&#10;3. Serve and enjoy!"
-                    required
+                    height={300}
+                    textareaProps={{
+                      placeholder:
+                        "## Drink Name\n\n**Ingredients:**\n- 2 oz Spirit\n- 1 oz Mixer\n- Garnish\n\n**Instructions:**\n1. Step 1\n2. Step 2\n3. Serve and enjoy!",
+                    }}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPreview(!showPreview)}
-                    className="absolute top-3 right-3 p-1 text-gray-500 hover:text-gray-700"
-                    title={showPreview ? "Hide preview" : "Show preview"}
-                  >
-                    {showPreview ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
                   Use Markdown formatting for better presentation
@@ -282,46 +261,6 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
               </div>
             </form>
           </div>
-
-          {/* Preview Side (Desktop) */}
-          {showPreview && (
-            <div className="lg:w-1/2 lg:border-l border-gray-200 p-6 bg-gray-50 overflow-y-auto">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                Preview
-              </h3>
-              <div className="bg-white rounded-lg p-4 min-h-full">
-                {formData.title && (
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                    {formData.title}
-                  </h2>
-                )}
-
-                {formData.image && (
-                  <img
-                    src={formData.image}
-                    alt={formData.title}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                )}
-
-                {formData.recipe ? (
-                  <div
-                    className="prose max-w-none text-gray-700"
-                    dangerouslySetInnerHTML={{
-                      __html: renderMarkdown(formData.recipe),
-                    }}
-                  />
-                ) : (
-                  <p className="text-gray-500 italic">
-                    Recipe preview will appear here...
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer */}

@@ -2,6 +2,7 @@ import React from "react";
 import { Plus, Edit3, Trash2, Package, PackageX, Eye } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
+import MDEditor from "@uiw/react-md-editor";
 
 const MenuTab: React.FC = () => {
   const {
@@ -142,13 +143,12 @@ const MenuTab: React.FC = () => {
                 </div>
 
                 {/* Recipe Preview */}
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                  {drink.recipe
-                    .replace(/[#*\-\d\.]/g, "")
-                    .trim()
-                    .substring(0, 100)}
-                  {drink.recipe.length > 100 ? "..." : ""}
-                </p>
+                <div className="text-sm text-gray-600 mb-4 line-clamp-2 prose max-w-none">
+                  <MDEditor.Markdown
+                    source={drink.recipe}
+                    style={{ background: "none", padding: 0, margin: 0 }}
+                  />
+                </div>
 
                 {/* Action Buttons */}
                 <div className="space-y-2">

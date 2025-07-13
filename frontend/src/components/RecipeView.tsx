@@ -2,6 +2,7 @@ import React from "react";
 import { X, Clock, Users, ChefHat } from "lucide-react";
 import { useApp, Drink } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
+import MDEditor from "@uiw/react-md-editor";
 
 interface RecipeViewProps {
   drink: Drink;
@@ -11,33 +12,6 @@ interface RecipeViewProps {
 const RecipeView: React.FC<RecipeViewProps> = ({ drink, onClose }) => {
   const { language } = useApp();
   const t = useTranslation(language);
-
-  const renderMarkdown = (text: string): string => {
-    return text
-      .replace(
-        /## (.*)/g,
-        '<h2 class="text-2xl font-bold mb-4 text-gray-800 border-b border-gray-200 pb-2">$1</h2>'
-      )
-      .replace(
-        /### (.*)/g,
-        '<h3 class="text-xl font-semibold mb-3 text-gray-800">$1</h3>'
-      )
-      .replace(
-        /\*\*(.*?)\*\*/g,
-        '<strong class="font-semibold text-gray-800">$1</strong>'
-      )
-      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-      .replace(
-        /- (.*)/g,
-        '<li class="flex items-start mb-2"><span class="text-blue-500 mr-2 mt-1">•</span><span>$1</span></li>'
-      )
-      .replace(
-        /(\d+)\. (.*)/g,
-        '<li class="flex items-start mb-2"><span class="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium mr-3 mt-0.5 flex-shrink-0">$1</span><span>$2</span></li>'
-      )
-      .replace(/\n\n/g, '<div class="mb-4"></div>')
-      .replace(/\n/g, "<br>");
-  };
 
   // Extract difficulty, prep time, and servings from recipe if present
   const extractMetadata = (recipe: string) => {
@@ -150,9 +124,9 @@ const RecipeView: React.FC<RecipeViewProps> = ({ drink, onClose }) => {
         {/* Content */}
         <div className="p-6 lg:p-8 overflow-y-auto max-h-[50vh]">
           <div className="prose prose-lg max-w-none">
-            <div
-              className="text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: renderMarkdown(drink.recipe) }}
+            <MDEditor.Markdown
+              source={drink.recipe}
+              style={{ background: "none", padding: 0, margin: 0 }}
             />
           </div>
         </div>
