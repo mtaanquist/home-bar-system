@@ -33,6 +33,6 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 -- Create indexes for better performance
-CREATE INDEX idx_orders_bar_status ON orders(bar_id, status);
-CREATE INDEX idx_drinks_bar_stock ON drinks(bar_id, in_stock);
-CREATE INDEX idx_orders_created_at ON orders(created_at);
+CREATE INDEX IF NOT EXISTS idx_orders_bar_status ON orders(bar_id, status);
+CREATE INDEX IF NOT EXISTS idx_drinks_bar_stock ON drinks(bar_id, in_stock);
+CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
