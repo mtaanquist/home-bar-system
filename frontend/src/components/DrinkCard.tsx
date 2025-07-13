@@ -51,6 +51,9 @@ const DrinkCard: React.FC<DrinkCardProps> = ({
         </button>
       </div>
     </div>
+    <div className="prose prose-sm text-gray-800 max-w-none">
+      {/* Rendered markdown content here */}
+    </div>
   </div>
 );
 

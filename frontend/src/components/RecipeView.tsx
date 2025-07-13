@@ -132,7 +132,7 @@ const RecipeView: React.FC<RecipeViewProps> = ({ drink, onClose }) => {
 
         {/* Content */}
         <div className="p-6 lg:p-8 overflow-y-auto max-h-[50vh]">
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-sm text-gray-800 max-w-none">
             <MDEditor.Markdown
               source={drink.recipe}
               style={{ background: "none", padding: 0, margin: 0 }}
