@@ -143,7 +143,7 @@ const MenuTab: React.FC = () => {
                 </div>
 
                 {/* Recipe Preview */}
-                <div className="text-sm text-gray-600 mb-4 line-clamp-2 prose max-w-none">
+                <div className="mb-4 line-clamp-2 prose max-w-none prose-p:text-gray-800 prose-li:text-gray-800 prose-strong:text-gray-900 prose-em:text-gray-700">
                   <MDEditor.Markdown
                     source={drink.recipe}
                     style={{ background: "none", padding: 0, margin: 0 }}

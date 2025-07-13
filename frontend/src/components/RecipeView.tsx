@@ -62,6 +62,15 @@ const RecipeView: React.FC<RecipeViewProps> = ({ drink, onClose }) => {
                 >
                   {drink.title}
                 </h1>
+                {drink.base_spirit && (
+                  <div
+                    className={`text-base font-medium mb-2 ${
+                      drink.image_url ? "text-white/90" : "text-blue-700"
+                    }`}
+                  >
+                    Base Spirit: {drink.base_spirit}
+                  </div>
+                )}
 
                 {/* Metadata */}
                 {(metadata.difficulty ||

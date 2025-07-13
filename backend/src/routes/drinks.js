@@ -97,7 +97,7 @@ router.post("/upload-image", upload.single("image"), (req, res) => {
 // Create new drink
 router.post("/", (req, res) => {
   try {
-    const { barId, title, imageUrl, recipe } = req.body;
+    const { barId, title, imageUrl, recipe, baseSpirit } = req.body;
 
     if (!barId || !title || !recipe) {
       return res
@@ -114,15 +114,16 @@ router.post("/", (req, res) => {
     }
 
     const stmt = db.prepare(`
-      INSERT INTO drinks (bar_id, title, image_url, recipe, in_stock)
-      VALUES (?, ?, ?, ?, 1)
+      INSERT INTO drinks (bar_id, title, image_url, recipe, in_stock, base_spirit)
+      VALUES (?, ?, ?, ?, 1, ?)
     `);
 
     const result = stmt.run(
       barId,
       title.trim(),
       imageUrl || null,
-      recipe.trim()
+      recipe.trim(),
+      baseSpirit || null
     );
 
     // Return the created drink
@@ -140,7 +141,7 @@ router.post("/", (req, res) => {
 router.put("/:drinkId", (req, res) => {
   try {
     const drinkId = req.params.drinkId;
-    const { barId, title, imageUrl, recipe, inStock } = req.body;
+    const { barId, title, imageUrl, recipe, inStock, baseSpirit } = req.body;
 
     if (!barId) {
       return res.status(400).json({ error: "Bar ID is required" });
@@ -175,6 +176,10 @@ router.put("/:drinkId", (req, res) => {
     if (inStock !== undefined) {
       updates.push("in_stock = ?");
       values.push(inStock ? 1 : 0);
+    }
+    if (baseSpirit !== undefined) {
+      updates.push("base_spirit = ?");
+      values.push(baseSpirit || null);
     }
 
     if (updates.length === 0) {

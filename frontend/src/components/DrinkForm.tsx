@@ -29,6 +29,7 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
     title: "title" in drink ? drink.title || "" : "",
     image: "image_url" in drink ? drink.image_url || "" : "",
     recipe: "recipe" in drink ? drink.recipe || "" : "",
+    baseSpirit: "base_spirit" in drink ? drink.base_spirit || "" : "",
   });
 
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -88,6 +89,11 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
       return;
     }
 
+    if (!formData.baseSpirit.trim()) {
+      setError("Base spirit is required");
+      return;
+    }
+
     setLoading(true);
     try {
       if (isEditing) {
@@ -99,6 +105,7 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
             title: formData.title.trim(),
             imageUrl: formData.image.trim() || null,
             recipe: formData.recipe.trim(),
+            baseSpirit: formData.baseSpirit.trim(),
           }),
         });
 
@@ -114,6 +121,7 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
             title: formData.title.trim(),
             imageUrl: formData.image.trim() || null,
             recipe: formData.recipe.trim(),
+            baseSpirit: formData.baseSpirit.trim(),
           }),
         });
 
@@ -164,6 +172,35 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
+              </div>
+
+              {/* Base Spirit */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Base Spirit *
+                </label>
+                <select
+                  value={formData.baseSpirit}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      baseSpirit: e.target.value,
+                    }))
+                  }
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Select base spirit</option>
+                  <option value="Vodka">Vodka</option>
+                  <option value="Gin">Gin</option>
+                  <option value="Rum">Rum</option>
+                  <option value="Tequila">Tequila</option>
+                  <option value="Whisky/Whiskey">Whisky/Whiskey</option>
+                  <option value="Brandy/Cognac">Brandy/Cognac</option>
+                  <option value="Liqueur">Liqueur</option>
+                  <option value="Non-alcoholic">Non-alcoholic</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
 
               {/* Image Upload */}

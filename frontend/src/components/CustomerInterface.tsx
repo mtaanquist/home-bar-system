@@ -61,7 +61,29 @@ const CustomerInterface: React.FC = () => {
       ["new", "accepted", "ready"].includes(order.status)
   );
 
-  const availableDrinks = drinks.filter((drink) => drink.in_stock);
+  // Group available drinks by base spirit
+  const groupedDrinks: { [spirit: string]: typeof drinks } = {};
+  drinks.forEach((drink) => {
+    if (drink.in_stock) {
+      const spirit = drink.base_spirit || "Other";
+      if (!groupedDrinks[spirit]) groupedDrinks[spirit] = [];
+      groupedDrinks[spirit].push(drink);
+    }
+  });
+  const baseSpiritOrder = [
+    "Vodka",
+    "Gin",
+    "Rum",
+    "Tequila",
+    "Whisky/Whiskey",
+    "Brandy/Cognac",
+    "Liqueur",
+    "Non-alcoholic",
+    "Other",
+  ];
+  const spiritsWithDrinks = baseSpiritOrder.filter(
+    (spirit) => groupedDrinks[spirit] && groupedDrinks[spirit].length > 0
+  );
 
   const handlePlaceOrder = async (drink: any) => {
     if (customerOrder) {
@@ -160,121 +182,137 @@ const CustomerInterface: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Current Order Status */}
-        {customerOrder && (
-          <div
-            className={`rounded-lg border-2 p-4 ${getStatusColor(
-              customerOrder.status
-            )}`}
-          >
-            <div className="flex items-center space-x-3">
-              {getStatusIcon(customerOrder.status)}
-              <div className="flex-1">
-                <h3 className="font-semibold">{t("yourOrder")}</h3>
-                <p className="text-sm opacity-90">
-                  {customerOrder.drink_title}
-                </p>
-                <p className="text-xs opacity-75">
-                  {t("orderStatus")}: {t(customerOrder.status)}
-                </p>
-              </div>
-              {customerOrder.status === "ready" && (
-                <div className="text-right">
-                  <div className="text-lg font-bold">🎉</div>
-                  <div className="text-xs font-medium">Ready!</div>
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6 flex">
+        {/* Left-hand menu for base spirits */}
+        <nav className="hidden md:block w-48 mr-6 sticky top-24 self-start">
+          <ul className="space-y-2">
+            {spiritsWithDrinks.map((spirit) => (
+              <li key={spirit}>
+                <a
+                  href={`#spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
+                  className="block px-3 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium"
+                >
+                  {spirit}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="flex-1 space-y-8">
+          {/* Current Order Status */}
+          {customerOrder && (
+            <div
+              className={`rounded-lg border-2 p-4 ${getStatusColor(
+                customerOrder.status
+              )}`}
+            >
+              <div className="flex items-center space-x-3">
+                {getStatusIcon(customerOrder.status)}
+                <div className="flex-1">
+                  <h3 className="font-semibold">{t("yourOrder")}</h3>
+                  <p className="text-sm opacity-90">
+                    {customerOrder.drink_title}
+                  </p>
+                  <p className="text-xs opacity-75">
+                    {t("orderStatus")}: {t(customerOrder.status)}
+                  </p>
                 </div>
-              )}
+                {customerOrder.status === "ready" && (
+                  <div className="text-right">
+                    <div className="text-lg font-bold">🎉</div>
+                    <div className="text-xs font-medium">Ready!</div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Available Drinks */}
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="p-4 border-b">
-            <h2 className="text-lg font-bold text-gray-800">
-              {t("availableDrinks")}
-            </h2>
-            <p className="text-sm text-gray-600">
-              {availableDrinks.length} drinks available
-            </p>
-          </div>
-
-          {availableDrinks.length === 0 ? (
+          {/* Grouped Available Drinks */}
+          {spiritsWithDrinks.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <Coffee className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p>No drinks available right now</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-              {availableDrinks.map((drink) => (
-                <div
-                  key={drink.id}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-                >
-                  {drink.image_url && (
-                    <div className="aspect-video overflow-hidden">
-                      <img
-                        src={drink.image_url}
-                        alt={drink.title}
-                        className="w-full h-full object-cover"
-                      />
+            spiritsWithDrinks.map((spirit) => (
+              <section
+                key={spirit}
+                id={`spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
+                className="scroll-mt-24"
+              >
+                <h2 className="text-2xl font-bold text-blue-800 mb-4">
+                  {spirit}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {groupedDrinks[spirit].map((drink) => (
+                    <div
+                      key={drink.id}
+                      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                    >
+                      {drink.image_url && (
+                        <div className="aspect-video overflow-hidden">
+                          <img
+                            src={drink.image_url}
+                            alt={drink.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <h3 className="font-semibold text-gray-800 mb-2">
+                          {drink.title}
+                        </h3>
+                        <div className="flex flex-col space-y-2">
+                          <button
+                            onClick={() => setViewingRecipe(drink)}
+                            className="w-full bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+                          >
+                            {t("viewRecipe")}
+                          </button>
+                          <button
+                            onClick={() => handlePlaceOrder(drink)}
+                            disabled={!!customerOrder || loading}
+                            className={`w-full py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                              customerOrder || loading
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-blue-600 text-white hover:bg-blue-700"
+                            }`}
+                          >
+                            {loading ? t("loading") : t("order")}
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-800 mb-2">
-                      {drink.title}
-                    </h3>
-
-                    <div className="flex flex-col space-y-2">
-                      <button
-                        onClick={() => setViewingRecipe(drink)}
-                        className="w-full bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-200 transition-colors"
-                      >
-                        {t("viewRecipe")}
-                      </button>
-                      <button
-                        onClick={() => handlePlaceOrder(drink)}
-                        disabled={!!customerOrder || loading}
-                        className={`w-full py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-                          customerOrder || loading
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
-                        }`}
-                      >
-                        {loading ? t("loading") : t("order")}
-                      </button>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </section>
+            ))
           )}
         </div>
+      </div>
 
-        {/* Help Text */}
-        {!customerOrder && availableDrinks.length > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <Coffee className="h-5 w-5 text-blue-400" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">
-                  How to order
-                </h3>
-                <div className="mt-2 text-sm text-blue-700">
-                  <p>
-                    Browse the available drinks above and click "Order" to place
-                    your order. You can only have one active order at a time.
-                    Your order status will update in real-time.
-                  </p>
-                </div>
+      {/* Help Text */}
+      {!customerOrder && spiritsWithDrinks.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <Coffee className="h-5 w-5 text-blue-400" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">
+                How to order
+              </h3>
+              <div className="mt-2 text-sm text-blue-700">
+                <p>
+                  Browse the available drinks above and click "Order" to place
+                  your order. You can only have one active order at a time. Your
+                  order status will update in real-time.
+                </p>
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -21,6 +21,7 @@ export interface Drink {
   recipe: string;
   in_stock: boolean;
   created_at: string;
+  base_spirit?: string;
 }
 
 export interface Order {
