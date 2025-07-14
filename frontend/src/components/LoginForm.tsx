@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useApp, Bar } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
@@ -19,12 +20,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ bar, onBack }) => {
     setLoginForm,
     setShowPassword,
     setCustomerName,
-    setCurrentView,
     setLoading,
     setError,
     apiCall,
   } = useApp();
 
+  const navigate = useNavigate();
   const t = useTranslation(language);
 
   const handleLogin = async () => {
@@ -63,7 +64,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ bar, onBack }) => {
         setCustomerName(loginForm.name);
       }
 
-      setCurrentView(userType === "bartender" ? "bartender" : "customer");
+      navigate(userType === "bartender" ? "/bartender" : "/customer");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

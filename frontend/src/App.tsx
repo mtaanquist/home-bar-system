@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./components/LandingPage";
 import BartenderDashboard from "./components/BartenderDashboard";
 import CustomerInterface from "./components/CustomerInterface";
@@ -11,13 +12,15 @@ import PastOrdersPage from "./pages/PastOrdersPage";
 
 const AppContent: React.FC = () => {
   const {
-    currentView,
     error,
     editingDrink,
     viewingRecipe,
     setError,
     setEditingDrink,
     setViewingRecipe,
+    userType,
+    currentBar,
+    customerName,
   } = useApp();
 
   // Error display
@@ -42,20 +45,48 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // Main views
-  switch (currentView) {
-    case "bartender":
-      return <BartenderDashboard />;
+  // Protected route logic
+  const isAuthenticated = userType && currentBar;
+  const isCustomerAuthenticated =
+    isAuthenticated && userType === "guest" && customerName;
+  const isBartenderAuthenticated = isAuthenticated && userType === "bartender";
 
-    case "customer":
-      return <CustomerInterface />;
-
-    case "pastOrders":
-      return <PastOrdersPage />;
-
-    default:
-      return <LandingPage />;
-  }
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route
+        path="/customer"
+        element={
+          isCustomerAuthenticated ? (
+            <CustomerInterface />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route
+        path="/customer/past-orders"
+        element={
+          isCustomerAuthenticated ? (
+            <PastOrdersPage />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route
+        path="/bartender"
+        element={
+          isBartenderAuthenticated ? (
+            <BartenderDashboard />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 };
 
 const App: React.FC = () => {
@@ -64,11 +95,13 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <AppProvider>
-      <WebSocketProvider>
-        <AppContent />
-      </WebSocketProvider>
-    </AppProvider>
+    <BrowserRouter>
+      <AppProvider>
+        <WebSocketProvider>
+          <AppContent />
+        </WebSocketProvider>
+      </AppProvider>
+    </BrowserRouter>
   );
 };
 

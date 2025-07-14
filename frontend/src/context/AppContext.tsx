@@ -44,7 +44,6 @@ export interface Analytics {
 
 interface AppContextType {
   // App state
-  currentView: "landing" | "bartender" | "customer" | "pastOrders";
   userType: "bartender" | "guest" | null;
   currentBar: Bar | null;
   customerName: string;
@@ -75,9 +74,6 @@ interface AppContextType {
   currentTab: "orders" | "menu" | "analytics";
 
   // Setters
-  setCurrentView: (
-    view: "landing" | "bartender" | "customer" | "pastOrders"
-  ) => void;
   setUserType: (type: "bartender" | "guest" | null) => void;
   setCurrentBar: (bar: Bar | null) => void;
   setCustomerName: (name: string) => void;
@@ -120,7 +116,6 @@ export const useApp = () => {
 const API_BASE = "/api";
 
 const STORAGE_KEYS = {
-  currentView: "homeBarSystem_currentView",
   userType: "homeBarSystem_userType",
   currentBar: "homeBarSystem_currentBar",
   customerName: "homeBarSystem_customerName",
@@ -146,10 +141,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // App state with initial values from localStorage
-  const [currentView, setCurrentViewState] = useState<
-    "landing" | "bartender" | "customer" | "pastOrders"
-  >(() => loadFromStorage(STORAGE_KEYS.currentView, "landing"));
-
   const [userType, setUserTypeState] = useState<"bartender" | "guest" | null>(
     () => loadFromStorage(STORAGE_KEYS.userType, null)
   );
@@ -171,22 +162,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   >(() => loadFromStorage(STORAGE_KEYS.currentTab, "orders"));
 
   // Wrapper functions that save to storage
-  const setCurrentView = (
-    view: "landing" | "bartender" | "customer" | "pastOrders"
-  ) => {
-    setCurrentViewState(view);
-    if (view === "landing") {
-      // Clear session when going back to landing
-      localStorage.removeItem(STORAGE_KEYS.currentView);
-      localStorage.removeItem(STORAGE_KEYS.userType);
-      localStorage.removeItem(STORAGE_KEYS.currentBar);
-      localStorage.removeItem(STORAGE_KEYS.customerName);
-      localStorage.removeItem(STORAGE_KEYS.currentTab);
-    } else {
-      saveToStorage(STORAGE_KEYS.currentView, view);
-    }
-  };
-
   const setUserType = (type: "bartender" | "guest" | null) => {
     setUserTypeState(type);
     if (type === null) {
@@ -247,34 +222,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   const [viewingRecipe, setViewingRecipe] = useState<Drink | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Clear all data function
+  const clearAllData = () => {
+    setUserType(null);
+    setCurrentBar(null);
+    setCustomerName("");
+    setLanguage("en");
+    setCurrentTab("menu");
+    setBarForm({
+      name: "",
+      bartenderPassword: "",
+      guestPassword: "",
+      language: "en",
+    });
+    setLoginForm({ password: "", name: "" });
+    localStorage.clear();
+  };
+
   // Session validation effect
   useEffect(() => {
     const validateSession = () => {
-      // If we have a view and userType but no currentBar, reset session
-      if (
-        (currentView === "bartender" || currentView === "customer") &&
-        !currentBar
-      ) {
+      // If we have a userType but no currentBar, reset session
+      if (userType && !currentBar) {
         console.log("Invalid session detected, resetting...");
-        setCurrentView("landing");
-        setUserType(null);
-        setCurrentBar(null);
-        setCustomerName("");
+        clearAllData();
         return;
       }
 
-      // If we have customer view but no customer name, reset
-      if (currentView === "customer" && userType === "guest" && !customerName) {
+      // If we have guest user but no customer name, reset
+      if (userType === "guest" && !customerName) {
         console.log("Customer session without name, resetting...");
-        setCurrentView("landing");
-        setUserType(null);
-        setCurrentBar(null);
+        clearAllData();
         return;
       }
     };
 
     validateSession();
-  }, [currentView, userType, currentBar, customerName]);
+  }, [userType, currentBar, customerName]);
 
   // API helper function
   const apiCall = async (endpoint: string, options: RequestInit = {}) => {
@@ -298,7 +282,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
 
   const value: AppContextType = {
     // App state
-    currentView,
     userType,
     currentBar,
     customerName,
@@ -324,7 +307,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     currentTab,
 
     // Setters
-    setCurrentView,
     setUserType,
     setCurrentBar,
     setCustomerName,

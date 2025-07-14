@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Clock, CheckCircle, XCircle, Coffee, Check } from "lucide-react";
 import { useApp, Drink } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
@@ -24,7 +25,7 @@ const CustomerInterface: React.FC = () => {
 
   const t = useTranslation(language);
   const { clearSession } = useSessionManager();
-  const { setCurrentView } = useApp();
+  const navigate = useNavigate();
 
   // Modal state for order placed
   const [showOrderPlacedModal, setShowOrderPlacedModal] = useState(false);
@@ -305,7 +306,7 @@ const CustomerInterface: React.FC = () => {
             ))}
             <li>
               <button
-                onClick={() => setCurrentView("pastOrders")}
+                onClick={() => navigate("/customer/past-orders")}
                 className="block px-3 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium w-full text-left"
               >
                 {t("pastOrders")}
@@ -323,7 +324,7 @@ const CustomerInterface: React.FC = () => {
             </button>
             <button
               className="flex-1 py-2 text-center font-bold text-base transition-colors border-b-2 border-transparent text-gray-500 bg-gray-50 hover:bg-gray-100"
-              onClick={() => setCurrentView("pastOrders")}
+              onClick={() => navigate("/customer/past-orders")}
             >
               {t("pastOrders")}
             </button>

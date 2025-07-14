@@ -1,20 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
 import { ArrowLeft } from "lucide-react";
 import PastOrders from "../components/PastOrders";
 
 const PastOrdersPage: React.FC = () => {
-  const {
-    orders,
-    drinks,
-    customerName,
-    loading,
-    language,
-    setCurrentView,
-    currentBar,
-  } = useApp();
+  const { orders, drinks, customerName, loading, language, currentBar } =
+    useApp();
   const t = useTranslation(language);
+  const navigate = useNavigate();
 
   // Compute the current active order for this customer
   const customerOrder = orders.find(
@@ -24,7 +19,7 @@ const PastOrdersPage: React.FC = () => {
   );
 
   const handleGoBack = () => {
-    setCurrentView("customer");
+    navigate("/customer");
   };
 
   return (

@@ -16,7 +16,6 @@ const BarCreator: React.FC<BarCreatorProps> = ({ onBack, onSuccess }) => {
     setCurrentBar,
     setLanguage,
     setUserType,
-    setCurrentView,
     setLoading,
     setError,
     apiCall,
@@ -51,7 +50,6 @@ const BarCreator: React.FC<BarCreatorProps> = ({ onBack, onSuccess }) => {
       });
       setLanguage(data.language as "en" | "da");
       setUserType("bartender");
-      setCurrentView("bartender");
 
       onSuccess();
     } catch (err) {
