@@ -5,7 +5,6 @@ import { useTranslation } from "../utils/translations";
 import { useSessionManager } from "../hooks/useSessionManager";
 import DrinkCard from "./DrinkCard";
 import OrderStatusCard from "./OrderStatusCard";
-import PastOrders from "./PastOrders";
 
 const CustomerInterface: React.FC = () => {
   const {
@@ -33,8 +32,8 @@ const CustomerInterface: React.FC = () => {
   const [randomDrink, setRandomDrink] = useState<Drink | null>(null);
   const [showRandomModal, setShowRandomModal] = useState(false);
 
-  // Tab state for mobile
-  const [mobileTab, setMobileTab] = useState<"menu" | "history">("menu");
+  // Tab state for mobile - no longer needed since we navigate to separate page
+  // const [mobileTab, setMobileTab] = useState<"menu" | "history">("menu");
 
   // Data fetching
   const fetchDrinks = async () => {
@@ -319,23 +318,12 @@ const CustomerInterface: React.FC = () => {
         <div className="flex-1 space-y-8">
           {/* Mobile tab navigation */}
           <div className="md:hidden mb-4 flex border-b">
-            <button
-              className={`flex-1 py-2 text-center font-bold text-base transition-colors border-b-2 ${
-                mobileTab === "menu"
-                  ? "border-blue-600 text-blue-700 bg-white"
-                  : "border-transparent text-gray-500 bg-gray-50"
-              }`}
-              onClick={() => setMobileTab("menu")}
-            >
+            <button className="flex-1 py-2 text-center font-bold text-base transition-colors border-b-2 border-blue-600 text-blue-700 bg-white">
               {t("availableDrinks")}
             </button>
             <button
-              className={`flex-1 py-2 text-center font-bold text-base transition-colors border-b-2 ${
-                mobileTab === "history"
-                  ? "border-blue-600 text-blue-700 bg-white"
-                  : "border-transparent text-gray-500 bg-gray-50"
-              }`}
-              onClick={() => setMobileTab("history")}
+              className="flex-1 py-2 text-center font-bold text-base transition-colors border-b-2 border-transparent text-gray-500 bg-gray-50 hover:bg-gray-100"
+              onClick={() => setCurrentView("pastOrders")}
             >
               {t("pastOrders")}
             </button>
@@ -351,53 +339,40 @@ const CustomerInterface: React.FC = () => {
             />
           )}
 
-          {/* Past Orders Section (mobile: only show if tab selected, desktop: always show) */}
-          {((mobileTab === "history" && window.innerWidth < 768)) && (
-            <PastOrders
-              orders={orders}
-              drinks={drinks}
-              customerName={customerName}
-              customerOrder={customerOrder}
-              loading={loading}
-              t={t}
-              handlePlaceOrder={handlePlaceOrder}
-            />
-          )}
+          {/* Past Orders Section - removed since it's now a separate page */}
 
-          {/* Grouped Available Drinks (mobile: only show if tab selected, desktop: always show) */}
-          {((mobileTab === "menu" && window.innerWidth < 768) ||
-            window.innerWidth >= 768) &&
-            (spiritsWithDrinks.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <Coffee className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>No drinks available right now</p>
-              </div>
-            ) : (
-              spiritsWithDrinks.map((spirit) => (
-                <section
-                  key={spirit}
-                  id={`spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
-                  className="scroll-mt-24"
-                >
-                  <h2 className="text-2xl font-bold text-blue-800 mb-4">
-                    {spirit}
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupedDrinks[spirit].map((drink) => (
-                      <DrinkCard
-                        key={drink.id}
-                        drink={drink}
-                        onViewRecipe={setViewingRecipe}
-                        onOrder={handlePlaceOrder}
-                        disabled={!!customerOrder || loading}
-                        loading={loading}
-                        t={t}
-                      />
-                    ))}
-                  </div>
-                </section>
-              ))
-            ))}
+          {/* Grouped Available Drinks */}
+          {spiritsWithDrinks.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              <Coffee className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No drinks available right now</p>
+            </div>
+          ) : (
+            spiritsWithDrinks.map((spirit) => (
+              <section
+                key={spirit}
+                id={`spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
+                className="scroll-mt-24"
+              >
+                <h2 className="text-2xl font-bold text-blue-800 mb-4">
+                  {spirit}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {groupedDrinks[spirit].map((drink) => (
+                    <DrinkCard
+                      key={drink.id}
+                      drink={drink}
+                      onViewRecipe={setViewingRecipe}
+                      onOrder={handlePlaceOrder}
+                      disabled={!!customerOrder || loading}
+                      loading={loading}
+                      t={t}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))
+          )}
         </div>
       </div>
     </div>
