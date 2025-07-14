@@ -352,8 +352,7 @@ const CustomerInterface: React.FC = () => {
           )}
 
           {/* Past Orders Section (mobile: only show if tab selected, desktop: always show) */}
-          {((mobileTab === "history" && window.innerWidth < 768) ||
-            window.innerWidth >= 768) && (
+          {((mobileTab === "history" && window.innerWidth < 768)) && (
             <PastOrders
               orders={orders}
               drinks={drinks}
