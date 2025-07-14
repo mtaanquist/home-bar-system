@@ -234,7 +234,7 @@ function handleWebSocketMessage(ws, data, clients) {
       break;
 
     case "leave_bar":
-      handleLeaveBar(ws, client);
+      handleLeaveBar(ws, client, clients);
       break;
 
     case "ping":
@@ -312,7 +312,7 @@ function handleJoinBar(ws, data, client, clients) {
   }
 }
 
-function handleLeaveBar(ws, client) {
+function handleLeaveBar(ws, client, clients) {
   if (client.barId) {
     console.log(`Client ${client.id} left bar ${client.barId}`);
 
