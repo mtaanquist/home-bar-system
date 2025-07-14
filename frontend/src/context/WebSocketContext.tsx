@@ -38,14 +38,18 @@ export const WebSocketProvider: React.FC<{ children: ReactNode }> = ({
   const { currentBar, userType, customerName, setOrders, apiCall } = useApp();
 
   const handleWebSocketMessage = (data: any) => {
+    console.log("[WebSocket] Received message:", data);
     switch (data.type) {
       case "new_order":
       case "order_status_updated":
+        console.log("[WebSocket] Fetching orders due to:", data.type);
         fetchOrders();
         break;
       case "order_deleted":
         setOrders((prev) => prev.filter((order) => order.id !== data.orderId));
         break;
+      default:
+        console.log("[WebSocket] Unhandled message type:", data.type);
     }
   };
 
@@ -77,8 +81,16 @@ export const WebSocketProvider: React.FC<{ children: ReactNode }> = ({
       };
 
       websocket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        handleWebSocketMessage(data);
+        try {
+          const data = JSON.parse(event.data);
+          handleWebSocketMessage(data);
+        } catch (err) {
+          console.error(
+            "[WebSocket] Failed to parse message:",
+            event.data,
+            err
+          );
+        }
       };
 
       websocket.onclose = () => {
