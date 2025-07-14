@@ -242,18 +242,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   // Session validation effect
   useEffect(() => {
     const validateSession = () => {
-      // If we have a userType but no currentBar, reset session
-      if (userType && !currentBar) {
-        console.log("Invalid session detected, resetting...");
-        clearAllData();
-        return;
-      }
-
-      // If we have guest user but no customer name, reset
-      if (userType === "guest" && !customerName) {
-        console.log("Customer session without name, resetting...");
-        clearAllData();
-        return;
+      // Only validate if user is supposed to be authenticated (has both userType and currentBar)
+      if (userType && currentBar) {
+        // If we have guest user but no customer name in an authenticated state, reset
+        if (userType === "guest" && !customerName) {
+          console.log("Authenticated guest session without name, resetting...");
+          clearAllData();
+          return;
+        }
       }
     };
 

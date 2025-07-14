@@ -10,21 +10,24 @@ const LandingPage: React.FC = () => {
   const t = useTranslation(language);
 
   const [mode, setMode] = useState<"select" | "create" | "login">("select");
+  const [selectedBar, setSelectedBar] = useState<Bar | null>(null);
 
   const handleSelectBar = (bar: Bar) => {
+    setSelectedBar(bar);
     setCurrentBar(bar);
     setLanguage(bar.language as "en" | "da");
     setMode("login");
   };
 
+  const resetToBarSelection = () => {
+    setSelectedBar(null);
+    setCurrentBar(null);
+    setMode("select");
+  };
+
   const handleCreateBarSuccess = () => {
     // Creation automatically logs in as bartender
     // No need to change mode, user goes directly to dashboard
-  };
-
-  const resetToBarSelection = () => {
-    setCurrentBar(null);
-    setMode("select");
   };
 
   const renderContent = () => {
@@ -38,8 +41,9 @@ const LandingPage: React.FC = () => {
         );
 
       case "login":
-        return currentBar ? (
-          <LoginForm bar={currentBar} onBack={resetToBarSelection} />
+        const barToUse = selectedBar || currentBar;
+        return barToUse ? (
+          <LoginForm bar={barToUse} onBack={resetToBarSelection} />
         ) : null;
 
       default:
@@ -57,7 +61,8 @@ const LandingPage: React.FC = () => {
       case "create":
         return "Create Your Bar";
       case "login":
-        return `${t("welcome")} ${currentBar?.name}`;
+        const barToUse = selectedBar || currentBar;
+        return barToUse ? `${t("welcome")} ${barToUse.name}` : "Login";
       default:
         return "Get Started";
     }
