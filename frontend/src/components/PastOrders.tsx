@@ -27,8 +27,7 @@ const PastOrders: React.FC<PastOrdersProps> = ({
   const pastOrders = orders
     .filter(
       (order) =>
-        order.customer_name === customerName &&
-        order.status === "processed" // Only show completed orders
+        order.customer_name === customerName && order.status === "processed" // Only show completed orders
     )
     .sort((a, b) => {
       const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;

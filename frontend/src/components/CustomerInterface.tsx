@@ -267,10 +267,12 @@ const CustomerInterface: React.FC = () => {
                 🍸 {currentBar?.name}
               </h1>
               <div className="flex items-center gap-4">
-                <p className="text-sm text-gray-600">Welcome, {customerName}!</p>
+                <p className="text-sm text-gray-600">
+                  Welcome, {customerName}!
+                </p>
                 <button
                   onClick={() => navigate("/customer/past-orders")}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
                 >
                   {t("pastOrders")}
                 </button>
@@ -278,7 +280,7 @@ const CustomerInterface: React.FC = () => {
             </div>
             <button
               onClick={clearSession}
-              className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+              className="text-gray-600 hover:text-gray-800 text-sm font-medium cursor-pointer"
             >
               {t("logout")}
             </button>
@@ -297,7 +299,7 @@ const CustomerInterface: React.FC = () => {
                 disabled={
                   allInStockDrinks.length === 0 || !!customerOrder || loading
                 }
-                className="w-full flex items-center justify-center px-3 py-2 mb-2 bg-pink-600 text-white rounded font-bold text-base shadow hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center px-3 py-2 mb-2 bg-pink-600 text-white rounded font-bold text-base shadow hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 🎲 {t("surpriseMe")}
               </button>
