@@ -36,6 +36,29 @@ const PastOrders: React.FC<PastOrdersProps> = ({
       return bTime - aTime;
     });
 
+  const formatOrderDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return `Today at ${date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+    } else if (diffDays === 1) {
+      return `Yesterday at ${date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+    } else if (diffDays < 7) {
+      return `${diffDays} days ago`;
+    } else {
+      return date.toLocaleDateString();
+    }
+  };
+
   if (pastOrders.length === 0) {
     return (
       <div className="text-center py-8">
@@ -50,7 +73,7 @@ const PastOrders: React.FC<PastOrdersProps> = ({
       <h2 className="text-xl font-bold text-gray-800 mb-4">
         {t("pastOrders")}
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-3">
         {pastOrders.map((order) => {
           const drink = drinks.find((d) => d.id === order.drink_id);
           const isInStock = drink && drink.in_stock;
@@ -63,7 +86,7 @@ const PastOrders: React.FC<PastOrdersProps> = ({
             >
               <div className="flex gap-4">
                 {/* Drink Image */}
-                <div className="w-24 h-24 flex-shrink-0">
+                <div className="w-20 h-20 flex-shrink-0">
                   {drink?.image_url ? (
                     <img
                       src={drink.image_url}
@@ -72,40 +95,43 @@ const PastOrders: React.FC<PastOrdersProps> = ({
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
-                      <Package className="w-8 h-8 text-gray-400" />
+                      <Package className="w-6 h-6 text-gray-400" />
                     </div>
                   )}
                 </div>
 
                 {/* Drink Details */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-blue-700 text-lg mb-1">
-                    {drink ? drink.title : order.drink_title}
-                  </h3>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-semibold text-blue-700 text-lg">
+                        {drink ? drink.title : order.drink_title}
+                      </h3>
+                      {drink?.base_spirit && (
+                        <p className="text-sm text-gray-600">
+                          {drink.base_spirit}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right text-sm text-gray-500">
+                      {formatOrderDate(order.created_at)}
+                    </div>
+                  </div>
 
-                  {drink?.base_spirit && (
-                    <p className="text-sm text-gray-600 mb-2">
-                      {drink.base_spirit}
-                    </p>
-                  )}
-
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-                      {t("status")}: {order.status}
-                    </span>
-                    {!isInStock && drink && (
+                  {!isInStock && drink && (
+                    <div className="mb-3">
                       <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600">
                         Out of Stock
                       </span>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
                   {/* Action Buttons */}
                   <div className="flex gap-2">
                     {drink && setViewingRecipe && (
                       <button
                         onClick={() => setViewingRecipe(drink)}
-                        className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-200 transition-colors flex items-center justify-center gap-1"
+                        className="flex items-center gap-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-200 transition-colors"
                       >
                         <Eye className="w-4 h-4" />
                         View Recipe
@@ -115,7 +141,7 @@ const PastOrders: React.FC<PastOrdersProps> = ({
                     <button
                       onClick={() => drink && handlePlaceOrder(drink)}
                       disabled={!canReorder}
-                      className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                      className="flex items-center gap-1 bg-green-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title={
                         !drink
                           ? "Drink no longer available"
