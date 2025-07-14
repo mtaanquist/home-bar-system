@@ -64,7 +64,12 @@ export const WebSocketProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
-    if (currentBar && (userType === "bartender" || userType === "guest")) {
+    // Only connect WebSocket when user is fully authenticated
+    const isFullyAuthenticated =
+      currentBar &&
+      (userType === "bartender" || (userType === "guest" && customerName));
+
+    if (isFullyAuthenticated) {
       const websocket = new WebSocket(WS_URL);
 
       websocket.onopen = () => {

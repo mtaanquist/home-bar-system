@@ -242,13 +242,40 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   // Session validation effect
   useEffect(() => {
     const validateSession = () => {
-      // Only validate if user is supposed to be authenticated (has both userType and currentBar)
-      if (userType && currentBar) {
-        // If we have guest user but no customer name in an authenticated state, reset
-        if (userType === "guest" && !customerName) {
-          console.log("Authenticated guest session without name, resetting...");
-          clearAllData();
-          return;
+      // Only validate sessions that should be fully authenticated
+      // This means checking routes that require authentication, not just the presence of userType/currentBar
+      const currentPath = window.location.pathname;
+      const isOnProtectedRoute =
+        currentPath.startsWith("/customer") ||
+        currentPath.startsWith("/bartender");
+
+      // Only validate if user is on a protected route
+      if (isOnProtectedRoute) {
+        // If on customer route but missing authentication requirements
+        if (currentPath.startsWith("/customer")) {
+          if (
+            !userType ||
+            !currentBar ||
+            userType !== "guest" ||
+            !customerName
+          ) {
+            console.log(
+              "Invalid customer session on protected route, resetting..."
+            );
+            clearAllData();
+            return;
+          }
+        }
+
+        // If on bartender route but missing authentication requirements
+        if (currentPath.startsWith("/bartender")) {
+          if (!userType || !currentBar || userType !== "bartender") {
+            console.log(
+              "Invalid bartender session on protected route, resetting..."
+            );
+            clearAllData();
+            return;
+          }
         }
       }
     };
