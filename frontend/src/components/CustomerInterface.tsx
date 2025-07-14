@@ -275,7 +275,7 @@ const CustomerInterface: React.FC = () => {
 
       {/* Main content container with left menu and main area */}
       <div className="max-w-4xl mx-auto px-4 py-6 flex space-x-6">
-        {/* Left-hand menu for base spirits */}
+        {/* Left-hand menu for base spirits (desktop only) */}
         <nav className="hidden md:block w-48 sticky top-24 self-start">
           <ul className="space-y-2">
             <li>
@@ -304,6 +304,18 @@ const CustomerInterface: React.FC = () => {
 
         {/* Main drink/order content */}
         <div className="flex-1 space-y-8">
+          {/* Surprise Me button for mobile */}
+          <div className="md:hidden mb-4">
+            <button
+              onClick={handleSurpriseMe}
+              disabled={
+                allInStockDrinks.length === 0 || !!customerOrder || loading
+              }
+              className="w-full flex items-center justify-center px-3 py-2 bg-pink-600 text-white rounded font-bold text-base shadow hover:bg-pink-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              🎲 {t("surpriseMe")}
+            </button>
+          </div>
           {/* Current Order Status */}
           {customerOrder && (
             <OrderStatusCard

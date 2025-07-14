@@ -230,7 +230,7 @@ function handleWebSocketMessage(ws, data, clients) {
 
   switch (data.type) {
     case "join_bar":
-      handleJoinBar(ws, data, client);
+      handleJoinBar(ws, data, client, clients);
       break;
 
     case "leave_bar":
@@ -265,7 +265,7 @@ function handleWebSocketMessage(ws, data, clients) {
   }
 }
 
-function handleJoinBar(ws, data, client) {
+function handleJoinBar(ws, data, client, clients) {
   const { barId, userType, customerName } = data;
 
   if (!barId || !userType) {
@@ -273,26 +273,6 @@ function handleJoinBar(ws, data, client) {
       JSON.stringify({
         type: "error",
         message: "barId and userType are required to join a bar",
-      })
-    );
-    return;
-  }
-
-  if (!["bartender", "guest"].includes(userType)) {
-    ws.send(
-      JSON.stringify({
-        type: "error",
-        message: 'userType must be either "bartender" or "guest"',
-      })
-    );
-    return;
-  }
-
-  if (userType === "guest" && !customerName) {
-    ws.send(
-      JSON.stringify({
-        type: "error",
-        message: "customerName is required for guest users",
       })
     );
     return;
