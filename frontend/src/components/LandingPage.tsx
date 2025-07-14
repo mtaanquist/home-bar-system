@@ -6,7 +6,8 @@ import BarCreator from "./BarCreator";
 import LoginForm from "./LoginForm";
 
 const LandingPage: React.FC = () => {
-  const { currentBar, language, setLanguage, setCurrentBar } = useApp();
+  const { currentBar, language, setLanguage, setCurrentBar, setLoginForm } =
+    useApp();
   const t = useTranslation(language);
 
   const [mode, setMode] = useState<"select" | "create" | "login">("select");
@@ -22,6 +23,7 @@ const LandingPage: React.FC = () => {
   const resetToBarSelection = () => {
     setSelectedBar(null);
     setCurrentBar(null);
+    setLoginForm({ password: "", name: "" }); // Clear login form fields
     setMode("select");
   };
 

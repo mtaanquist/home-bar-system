@@ -6,8 +6,19 @@ import { ArrowLeft } from "lucide-react";
 import PastOrders from "../components/PastOrders";
 
 const PastOrdersPage: React.FC = () => {
-  const { orders, drinks, customerName, loading, language, currentBar } =
-    useApp();
+  const {
+    orders,
+    drinks,
+    customerName,
+    loading,
+    language,
+    currentBar,
+    setViewingRecipe,
+    setLoading,
+    setError,
+    setOrders,
+    apiCall,
+  } = useApp();
   const t = useTranslation(language);
   const navigate = useNavigate();
 
@@ -20,6 +31,36 @@ const PastOrdersPage: React.FC = () => {
 
   const handleGoBack = () => {
     navigate("/customer");
+  };
+
+  const handlePlaceOrder = async (drink: any) => {
+    if (customerOrder) {
+      alert("You can only have one active order at a time");
+      return;
+    }
+    setLoading(true);
+    try {
+      await apiCall("/orders", {
+        method: "POST",
+        body: JSON.stringify({
+          barId: currentBar!.id,
+          customerName,
+          drinkId: drink.id,
+          drinkTitle: drink.title,
+        }),
+      });
+
+      // Refresh orders after placing order
+      const updatedOrders = await apiCall(`/orders/bar/${currentBar!.id}`);
+      setOrders(updatedOrders);
+
+      // Navigate back to customer interface to see the new order
+      navigate("/customer");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to place order");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,7 +98,8 @@ const PastOrdersPage: React.FC = () => {
           customerOrder={customerOrder}
           loading={loading}
           t={t}
-          handlePlaceOrder={() => {}}
+          handlePlaceOrder={handlePlaceOrder}
+          setViewingRecipe={setViewingRecipe}
         />
       </div>
     </div>

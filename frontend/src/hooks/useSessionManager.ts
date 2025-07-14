@@ -6,7 +6,8 @@ const SESSION_TIMEOUT = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 const ACTIVITY_KEY = "homeBarSystem_lastActivity";
 
 export const useSessionManager = () => {
-  const { setUserType, setCurrentBar, setCustomerName } = useApp();
+  const { setUserType, setCurrentBar, setCustomerName, setLoginForm } =
+    useApp();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,6 +29,7 @@ export const useSessionManager = () => {
     setUserType(null);
     setCurrentBar(null);
     setCustomerName("");
+    setLoginForm({ password: "", name: "" }); // Clear login form fields
     localStorage.removeItem(ACTIVITY_KEY);
   };
 

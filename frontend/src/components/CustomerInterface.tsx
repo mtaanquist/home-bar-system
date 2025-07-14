@@ -304,6 +304,8 @@ const CustomerInterface: React.FC = () => {
                 </a>
               </li>
             ))}
+            {/* Divider before past orders */}
+            <li className="border-t border-gray-200 my-2"></li>
             <li>
               <button
                 onClick={() => navigate("/customer/past-orders")}
