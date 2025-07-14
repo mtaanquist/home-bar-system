@@ -131,6 +131,7 @@ app.use("/api/*", (req, res) => {
 // WebSocket setup (attach to same HTTP server, path: /ws)
 const wss = new WebSocketServer({ server, path: "/ws" });
 setupWebSocket(wss);
+app.locals.wss = wss; // <-- Make wss available to routes for broadcasting
 
 // Global error handler
 app.use((err, req, res, next) => {
