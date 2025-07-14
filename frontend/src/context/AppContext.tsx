@@ -44,7 +44,7 @@ export interface Analytics {
 
 interface AppContextType {
   // App state
-  currentView: "landing" | "bartender" | "customer";
+  currentView: "landing" | "bartender" | "customer" | "pastOrders";
   userType: "bartender" | "guest" | null;
   currentBar: Bar | null;
   customerName: string;
@@ -75,7 +75,9 @@ interface AppContextType {
   currentTab: "orders" | "menu" | "analytics";
 
   // Setters
-  setCurrentView: (view: "landing" | "bartender" | "customer") => void;
+  setCurrentView: (
+    view: "landing" | "bartender" | "customer" | "pastOrders"
+  ) => void;
   setUserType: (type: "bartender" | "guest" | null) => void;
   setCurrentBar: (bar: Bar | null) => void;
   setCustomerName: (name: string) => void;
@@ -145,7 +147,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
 
   // App state with initial values from localStorage
   const [currentView, setCurrentViewState] = useState<
-    "landing" | "bartender" | "customer"
+    "landing" | "bartender" | "customer" | "pastOrders"
   >(() => loadFromStorage(STORAGE_KEYS.currentView, "landing"));
 
   const [userType, setUserTypeState] = useState<"bartender" | "guest" | null>(
@@ -169,7 +171,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   >(() => loadFromStorage(STORAGE_KEYS.currentTab, "orders"));
 
   // Wrapper functions that save to storage
-  const setCurrentView = (view: "landing" | "bartender" | "customer") => {
+  const setCurrentView = (
+    view: "landing" | "bartender" | "customer" | "pastOrders"
+  ) => {
     setCurrentViewState(view);
     if (view === "landing") {
       // Clear session when going back to landing

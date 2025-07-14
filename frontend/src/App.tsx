@@ -7,6 +7,7 @@ import RecipeView from "./components/RecipeView";
 import ErrorDisplay from "./components/ErrorDisplay";
 import { AppProvider, useApp } from "./context/AppContext";
 import { WebSocketProvider } from "./context/WebSocketContext";
+import PastOrdersPage from "./pages/PastOrdersPage";
 
 const AppContent: React.FC = () => {
   const {
@@ -48,6 +49,9 @@ const AppContent: React.FC = () => {
 
     case "customer":
       return <CustomerInterface />;
+
+    case "pastOrders":
+      return <PastOrdersPage />;
 
     default:
       return <LandingPage />;

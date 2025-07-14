@@ -25,6 +25,7 @@ const CustomerInterface: React.FC = () => {
 
   const t = useTranslation(language);
   const { clearSession } = useSessionManager();
+  const { setCurrentView } = useApp();
 
   // Modal state for order placed
   const [showOrderPlacedModal, setShowOrderPlacedModal] = useState(false);
@@ -303,6 +304,14 @@ const CustomerInterface: React.FC = () => {
                 </a>
               </li>
             ))}
+            <li>
+              <button
+                onClick={() => setCurrentView("pastOrders")}
+                className="block px-3 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium w-full text-left"
+              >
+                {t("pastOrders")}
+              </button>
+            </li>
           </ul>
         </nav>
 
