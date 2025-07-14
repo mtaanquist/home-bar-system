@@ -266,7 +266,15 @@ const CustomerInterface: React.FC = () => {
               <h1 className="text-xl font-bold text-gray-800">
                 🍸 {currentBar?.name}
               </h1>
-              <p className="text-sm text-gray-600">Welcome, {customerName}!</p>
+              <div className="flex items-center gap-4">
+                <p className="text-sm text-gray-600">Welcome, {customerName}!</p>
+                <button
+                  onClick={() => navigate("/customer/past-orders")}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  {t("pastOrders")}
+                </button>
+              </div>
             </div>
             <button
               onClick={clearSession}
@@ -304,32 +312,16 @@ const CustomerInterface: React.FC = () => {
                 </a>
               </li>
             ))}
-            {/* Divider before past orders */}
-            <li className="border-t border-gray-200 my-2"></li>
-            <li>
-              <button
-                onClick={() => navigate("/customer/past-orders")}
-                className="block px-3 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium w-full text-left"
-              >
-                {t("pastOrders")}
-              </button>
-            </li>
           </ul>
         </nav>
 
         {/* Main drink/order content */}
         <div className="flex-1 space-y-8">
-          {/* Mobile tab navigation */}
-          <div className="md:hidden mb-4 flex border-b">
-            <button className="flex-1 py-2 text-center font-bold text-base transition-colors border-b-2 border-blue-600 text-blue-700 bg-white">
+          {/* Mobile header - no tab navigation needed since Past Orders is now in header */}
+          <div className="md:hidden mb-4">
+            <h2 className="text-lg font-bold text-blue-800 text-center py-2">
               {t("availableDrinks")}
-            </button>
-            <button
-              className="flex-1 py-2 text-center font-bold text-base transition-colors border-b-2 border-transparent text-gray-500 bg-gray-50 hover:bg-gray-100"
-              onClick={() => navigate("/customer/past-orders")}
-            >
-              {t("pastOrders")}
-            </button>
+            </h2>
           </div>
 
           {/* Current Order Status */}
