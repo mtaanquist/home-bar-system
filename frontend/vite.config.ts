@@ -13,4 +13,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate vendor libraries into their own chunks
+          "react-vendor": ["react", "react-dom"],
+          router: ["react-router-dom"],
+          markdown: ["@uiw/react-md-editor"],
+          icons: ["lucide-react"],
+        },
+      },
+    },
+    // Increase the chunk size warning limit to 800kb to reduce noise
+    chunkSizeWarningLimit: 800,
+  },
 });

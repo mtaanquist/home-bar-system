@@ -4,7 +4,7 @@ import { useApp, Drink } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
-import MDEditor from "@uiw/react-md-editor";
+import LazyMDEditor from "./LazyMDEditor";
 
 interface DrinkFormProps {
   drink: Drink | {};
@@ -288,7 +288,7 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
                   {t("recipe")} *
                 </label>
                 <div className="relative">
-                  <MDEditor
+                  <LazyMDEditor
                     value={formData.recipe}
                     onChange={(value) =>
                       setFormData((prev) => ({

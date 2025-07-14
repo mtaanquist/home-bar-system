@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { X, Clock, Users, ChefHat } from "lucide-react";
 import { useApp, Drink } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
-import MDEditor from "@uiw/react-md-editor";
+import { LazyMarkdownViewer } from "./LazyMDEditor";
 
 interface RecipeViewProps {
   drink: Drink;
@@ -145,7 +145,7 @@ const RecipeView: React.FC<RecipeViewProps> = ({ drink, onClose }) => {
         <div className="p-6 lg:p-8 overflow-y-auto max-h-[50vh]">
           {/* Ensure the markdown container uses a readable color and prose styling */}
           <div className="prose prose-sm text-gray-800 max-w-none">
-            <MDEditor.Markdown
+            <LazyMarkdownViewer
               source={drink.recipe}
               style={{
                 // Force readable text color for markdown output

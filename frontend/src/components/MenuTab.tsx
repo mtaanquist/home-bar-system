@@ -2,7 +2,7 @@ import React from "react";
 import { Plus, Edit3, Trash2, Package, PackageX, Eye } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
-import MDEditor from "@uiw/react-md-editor";
+import { LazyMarkdownViewer } from "./LazyMDEditor";
 
 const MenuTab: React.FC = () => {
   const {
@@ -144,7 +144,7 @@ const MenuTab: React.FC = () => {
 
                 {/* Recipe Preview */}
                 <div className="mb-4 line-clamp-2 prose max-w-none prose-p:text-gray-800 prose-li:text-gray-800 prose-strong:text-gray-900 prose-em:text-gray-700">
-                  <MDEditor.Markdown
+                  <LazyMarkdownViewer
                     source={drink.recipe}
                     style={{ background: "none", padding: 0, margin: 0 }}
                   />
