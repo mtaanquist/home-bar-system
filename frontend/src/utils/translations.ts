@@ -60,6 +60,9 @@ export interface TranslationMap {
   baseSpirit: string;
   orderThis: string;
   tryAnother: string;
+  pastOrders: string; // Added
+  reorder: string; // Added
+  status: string; // Added
 
   // Status messages
   oneOrderLimit: string;
@@ -134,6 +137,9 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     baseSpirit: "Base Spirit",
     orderThis: "Order this!",
     tryAnother: "Try another",
+    pastOrders: "Past Orders", // Added
+    reorder: "Reorder", // Added
+    status: "Status", // Added
 
     // Status messages
     oneOrderLimit: "You can only have one active order at a time",
@@ -204,8 +210,11 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     surpriseMe: "Surprise Me!",
     yourRandomDrink: "Your Random Drink",
     baseSpirit: "Base Spirit",
-    orderThis: "Order this!",
-    tryAnother: "Try another",
+    orderThis: "Bestil denne!",
+    tryAnother: "Prøv en anden",
+    pastOrders: "Tidligere bestillinger", // Added
+    reorder: "Bestil igen", // Added
+    status: "Status", // Added
 
     // Status messages
     oneOrderLimit: "Du kan kun have én aktiv bestilling ad gangen",
