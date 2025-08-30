@@ -30,6 +30,8 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
     image: "image_url" in drink ? drink.image_url || "" : "",
     recipe: "recipe" in drink ? drink.recipe || "" : "",
     baseSpirit: "base_spirit" in drink ? drink.base_spirit || "" : "",
+    guestDescription: "guest_description" in drink ? drink.guest_description || "" : "",
+    showRecipeToGuests: "show_recipe_to_guests" in drink ? drink.show_recipe_to_guests || false : false,
   });
 
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -106,6 +108,8 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
             imageUrl: formData.image.trim() || null,
             recipe: formData.recipe.trim(),
             baseSpirit: formData.baseSpirit.trim(),
+            guestDescription: formData.guestDescription.trim() || null,
+            showRecipeToGuests: formData.showRecipeToGuests,
           }),
         });
 
@@ -122,6 +126,8 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
             imageUrl: formData.image.trim() || null,
             recipe: formData.recipe.trim(),
             baseSpirit: formData.baseSpirit.trim(),
+            guestDescription: formData.guestDescription.trim() || null,
+            showRecipeToGuests: formData.showRecipeToGuests,
           }),
         });
 
@@ -306,6 +312,53 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
                 <p className="mt-1 text-xs text-gray-500">
                   Use Markdown formatting for better presentation
                 </p>
+              </div>
+
+              {/* Guest Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t("guestDescription")}
+                </label>
+                <textarea
+                  value={formData.guestDescription}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      guestDescription: e.target.value,
+                    }))
+                  }
+                  rows={4}
+                  placeholder="Optional description shown to guests..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {t("guestDescriptionHelp")}
+                </p>
+              </div>
+
+              {/* Show Recipe to Guests Toggle */}
+              <div>
+                <label className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.showRecipeToGuests}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        showRecipeToGuests: e.target.checked,
+                      }))
+                    }
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-gray-700">
+                      {t("showRecipeToGuests")}
+                    </span>
+                    <p className="text-xs text-gray-500">
+                      {t("showRecipeHelp")}
+                    </p>
+                  </div>
+                </label>
               </div>
             </form>
           </div>

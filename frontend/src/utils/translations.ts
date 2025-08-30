@@ -39,6 +39,10 @@ export interface TranslationMap {
   uploadImage: string;
   or: string;
   recipe: string;
+  guestDescription: string;
+  showRecipeToGuests: string;
+  guestDescriptionHelp: string;
+  showRecipeHelp: string;
   save: string;
   cancel: string;
 
@@ -123,6 +127,10 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     uploadImage: "Upload Image",
     or: "or",
     recipe: "Recipe (Markdown)",
+    guestDescription: "Guest Description",
+    showRecipeToGuests: "Show Recipe to Guests",
+    guestDescriptionHelp: "Optional description shown to guests instead of or alongside the recipe",
+    showRecipeHelp: "When enabled, guests can see the full recipe. When disabled, they only see the guest description (if provided).",
     save: "Save",
     cancel: "Cancel",
 
@@ -206,6 +214,10 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     uploadImage: "Upload Billede",
     or: "eller",
     recipe: "Opskrift (Markdown)",
+    guestDescription: "Gæste Beskrivelse",
+    showRecipeToGuests: "Vis Opskrift til Gæster",
+    guestDescriptionHelp: "Valgfri beskrivelse vist til gæster i stedet for eller sammen med opskriften",
+    showRecipeHelp: "Når aktiveret, kan gæster se den fulde opskrift. Når deaktiveret, ser de kun gæste beskrivelsen (hvis angivet).",
     save: "Gem",
     cancel: "Annuller",
 
