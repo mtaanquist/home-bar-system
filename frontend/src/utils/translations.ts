@@ -64,6 +64,14 @@ export interface TranslationMap {
   reorder: string; // Added
   status: string; // Added
 
+  // QR Code
+  generateQR: string;
+  qrCodeTitle: string;
+  qrCodeInstructions: string;
+  downloadQR: string;
+  directLink: string;
+  close: string;
+
   // Status messages
   oneOrderLimit: string;
   orderPlaced: string;
@@ -141,6 +149,14 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     reorder: "Reorder", // Added
     status: "Status", // Added
 
+    // QR Code
+    generateQR: "Generate QR",
+    qrCodeTitle: "QR Code for",
+    qrCodeInstructions: "Guests can scan this QR code to quickly access your bar and place orders.",
+    downloadQR: "Download QR Code",
+    directLink: "Direct link:",
+    close: "Close",
+
     // Status messages
     oneOrderLimit: "You can only have one active order at a time",
     orderPlaced: "Order placed successfully!",
@@ -215,6 +231,14 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     pastOrders: "Tidligere bestillinger", // Added
     reorder: "Bestil igen", // Added
     status: "Status", // Added
+
+    // QR Code
+    generateQR: "Generér QR",
+    qrCodeTitle: "QR-kode til",
+    qrCodeInstructions: "Gæster kan scanne denne QR-kode for hurtigt at få adgang til din bar og afgive bestillinger.",
+    downloadQR: "Download QR-kode",
+    directLink: "Direkte link:",
+    close: "Luk",
 
     // Status messages
     oneOrderLimit: "Du kan kun have én aktiv bestilling ad gangen",

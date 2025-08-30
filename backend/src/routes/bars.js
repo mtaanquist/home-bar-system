@@ -1,5 +1,6 @@
 import express from "express";
 import bcrypt from "bcrypt";
+import QRCode from "qrcode";
 import { db } from "../server.js";
 
 const router = express.Router();
@@ -324,6 +325,102 @@ router.get("/", (req, res) => {
   } catch (error) {
     console.error("Error fetching bars:", error);
     res.status(500).json({ error: "Failed to fetch bars" });
+  }
+});
+
+// Generate QR code for bar
+router.get("/:id/qrcode", async (req, res) => {
+  try {
+    const barId = req.params.id;
+
+    // Verify bar exists and get guest password
+    const stmt = db.prepare("SELECT id, name, guest_password_hash FROM bars WHERE id = ?");
+    const bar = stmt.get(barId);
+
+    if (!bar) {
+      return res.status(404).json({ error: "Bar not found" });
+    }
+
+    // Get the base URL from environment or use default
+    const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    
+    // Create a simple guest access token (base64 encoded bar info)
+    // This is not super secure but good enough for a home bar system
+    const guestToken = Buffer.from(`${barId}:guest_access`).toString('base64');
+    
+    // Create the URL that will take users directly to guest access for this bar
+    const qrUrl = `${baseUrl}/bar/${barId}?token=${guestToken}`;
+
+    // Generate QR code as data URL
+    const qrCodeDataUrl = await QRCode.toDataURL(qrUrl, {
+      width: 512,
+      margin: 2,
+      color: {
+        dark: '#1e40af', // Blue color matching the app theme
+        light: '#ffffff'
+      }
+    });
+
+    res.json({
+      barId: bar.id,
+      barName: bar.name,
+      url: qrUrl,
+      qrCode: qrCodeDataUrl
+    });
+  } catch (error) {
+    console.error("Error generating QR code:", error);
+    res.status(500).json({ error: "Failed to generate QR code" });
+  }
+});
+
+// Validate guest token and auto-login
+router.post("/:id/guest-token-login", async (req, res) => {
+  try {
+    const barId = req.params.id;
+    const { token, customerName } = req.body;
+
+    if (!token || !customerName) {
+      return res.status(400).json({ error: "Token and customer name are required" });
+    }
+
+    // Validate customer name
+    if (customerName.trim().length < 2) {
+      return res.status(400).json({ error: "Customer name must be at least 2 characters" });
+    }
+
+    // Decode and validate token
+    let decodedToken;
+    try {
+      decodedToken = Buffer.from(token, 'base64').toString('utf-8');
+      const [tokenBarId, tokenType] = decodedToken.split(':');
+      
+      if (tokenBarId !== barId || tokenType !== 'guest_access') {
+        throw new Error('Invalid token');
+      }
+    } catch (err) {
+      return res.status(401).json({ error: "Invalid or expired token" });
+    }
+
+    // Get bar info
+    const stmt = db.prepare("SELECT * FROM bars WHERE id = ?");
+    const bar = stmt.get(barId);
+
+    if (!bar) {
+      return res.status(404).json({ error: "Bar not found" });
+    }
+
+    // Return successful guest authentication
+    res.json({
+      success: true,
+      barId: bar.id,
+      barName: bar.name,
+      language: bar.language,
+      customerName: customerName.trim(),
+      userType: "guest",
+    });
+  } catch (error) {
+    console.error("Guest token login error:", error);
+    res.status(500).json({ error: "Authentication failed" });
   }
 });
 

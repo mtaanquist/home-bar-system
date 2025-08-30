@@ -6,6 +6,7 @@ import CustomerInterface from "./components/CustomerInterface";
 import DrinkForm from "./components/DrinkForm";
 import RecipeView from "./components/RecipeView";
 import ErrorDisplay from "./components/ErrorDisplay";
+import QRRedirect from "./components/QRRedirect";
 import { AppProvider, useApp } from "./context/AppContext";
 import { WebSocketProvider } from "./context/WebSocketContext";
 import PastOrdersPage from "./pages/PastOrdersPage";
@@ -54,6 +55,7 @@ const AppContent: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/bar/:id" element={<QRRedirect />} />
       <Route
         path="/customer"
         element={

@@ -5,13 +5,21 @@ import { useApp, Bar } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
 
 interface LoginFormProps {
-  bar: Bar;
+  bar?: Bar;
   onBack: () => void;
+  mode?: "bartender" | "guest";
+  prefilledBarId?: string;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ bar, onBack }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ 
+  bar, 
+  onBack, 
+  mode, 
+  prefilledBarId 
+}) => {
   const {
     userType,
+    currentBar,
     language,
     loading,
     loginForm,
@@ -28,6 +36,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ bar, onBack }) => {
   const navigate = useNavigate();
   const t = useTranslation(language);
 
+  // Use the provided bar or the current bar from context
+  const targetBar = bar || currentBar;
+  const barId = prefilledBarId || targetBar?.id;
+
+  // Set the mode if provided
+  React.useEffect(() => {
+    if (mode && !userType) {
+      setUserType(mode);
+    }
+  }, [mode, userType, setUserType]);
+
   const handleLogin = async () => {
     if (!loginForm.password) {
       setError("Password is required");
@@ -39,6 +58,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ bar, onBack }) => {
       return;
     }
 
+    if (!barId) {
+      setError("Bar information is missing");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -46,7 +70,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ bar, onBack }) => {
       const endpoint =
         userType === "bartender" ? "/auth/bartender" : "/auth/guest";
       const body: any = {
-        barId: bar.id,
+        barId: barId,
         password: loginForm.password,
       };
 
@@ -80,40 +104,44 @@ const LoginForm: React.FC<LoginFormProps> = ({ bar, onBack }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="font-semibold text-gray-700">Login to {bar.name}</h4>
+        <h4 className="font-semibold text-gray-700">
+          {targetBar ? `Login to ${targetBar.name}` : 'Bar Login'}
+        </h4>
         <button
           onClick={onBack}
           className="text-sm text-gray-500 hover:text-gray-700"
         >
-          ← Change Bar
+          ← {targetBar ? 'Change Bar' : 'Back'}
         </button>
       </div>
 
-      {/* User Type Selection */}
-      <div className="grid grid-cols-1 gap-3">
-        <button
-          onClick={() => setUserType("bartender")}
-          className={`w-full py-3 rounded-lg transition-colors font-medium flex items-center justify-center space-x-2 ${
-            userType === "bartender"
-              ? "bg-blue-600 text-white"
-              : "bg-blue-100 text-blue-700 hover:bg-blue-200"
-          }`}
-        >
-          <LogIn className="w-4 h-4" />
-          <span>{t("bartenderLogin")}</span>
-        </button>
-        <button
-          onClick={() => setUserType("guest")}
-          className={`w-full py-3 rounded-lg transition-colors font-medium flex items-center justify-center space-x-2 ${
-            userType === "guest"
-              ? "bg-green-600 text-white"
-              : "bg-green-100 text-green-700 hover:bg-green-200"
-          }`}
-        >
-          <LogIn className="w-4 h-4" />
-          <span>{t("guestLogin")}</span>
-        </button>
-      </div>
+      {/* User Type Selection - only show if not in QR redirect mode */}
+      {!mode && (
+        <div className="grid grid-cols-1 gap-3">
+          <button
+            onClick={() => setUserType("bartender")}
+            className={`w-full py-3 rounded-lg transition-colors font-medium flex items-center justify-center space-x-2 ${
+              userType === "bartender"
+                ? "bg-blue-600 text-white"
+                : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+            }`}
+          >
+            <LogIn className="w-4 h-4" />
+            <span>{t("bartenderLogin")}</span>
+          </button>
+          <button
+            onClick={() => setUserType("guest")}
+            className={`w-full py-3 rounded-lg transition-colors font-medium flex items-center justify-center space-x-2 ${
+              userType === "guest"
+                ? "bg-green-600 text-white"
+                : "bg-green-100 text-green-700 hover:bg-green-200"
+            }`}
+          >
+            <LogIn className="w-4 h-4" />
+            <span>{t("guestLogin")}</span>
+          </button>
+        </div>
+      )}
 
       {/* Login Form */}
       {userType && (

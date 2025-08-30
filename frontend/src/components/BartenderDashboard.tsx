@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Plus } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Plus, QrCode } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { useTranslation } from "../utils/translations";
 import { useSessionManager } from "../hooks/useSessionManager";
@@ -23,6 +23,15 @@ const BartenderDashboard: React.FC = () => {
 
   const t = useTranslation(language);
   const { clearSession } = useSessionManager();
+  
+  // QR code modal state
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrData, setQrData] = useState<{
+    qrCode: string;
+    url: string;
+    barName: string;
+  } | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
 
   // Data fetching functions
   const fetchDrinks = async () => {
@@ -55,6 +64,22 @@ const BartenderDashboard: React.FC = () => {
     }
   };
 
+  // Generate QR code
+  const handleGenerateQR = async () => {
+    if (!currentBar) return;
+    
+    setQrLoading(true);
+    try {
+      const data = await apiCall(`/bars/${currentBar.id}/qrcode`);
+      setQrData(data);
+      setShowQRModal(true);
+    } catch (err) {
+      console.error("Error generating QR code:", err);
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
   // Initial data fetch
   useEffect(() => {
     if (currentBar) {
@@ -82,12 +107,22 @@ const BartenderDashboard: React.FC = () => {
                 Bartender
               </span>
             </div>
-            <button
-              onClick={clearSession}
-              className="text-gray-600 hover:text-gray-800 font-medium"
-            >
-              {t("logout")}
-            </button>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleGenerateQR}
+                disabled={qrLoading}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <QrCode className="w-4 h-4" />
+                <span className="hidden sm:inline">{t("generateQR")}</span>
+              </button>
+              <button
+                onClick={clearSession}
+                className="text-gray-600 hover:text-gray-800 font-medium"
+              >
+                {t("logout")}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -151,6 +186,56 @@ const BartenderDashboard: React.FC = () => {
           >
             <Plus className="w-6 h-6" />
           </button>
+        </div>
+      )}
+
+      {/* QR Code Modal */}
+      {showQRModal && qrData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">
+                {t("qrCodeTitle")} {qrData.barName}
+              </h3>
+              <div className="mb-4 p-4 bg-white border border-gray-200 rounded-lg inline-block">
+                <img 
+                  src={qrData.qrCode} 
+                  alt="Bar QR Code" 
+                  className="w-64 h-64 mx-auto"
+                />
+              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                {t("qrCodeInstructions")}
+              </p>
+              <div className="bg-gray-50 p-3 rounded-lg mb-4">
+                <p className="text-xs text-gray-500 mb-1">{t("directLink")}</p>
+                <code className="text-xs break-all bg-white p-2 rounded border">
+                  {qrData.url}
+                </code>
+              </div>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.download = `${qrData.barName}_QR_Code.png`;
+                    link.href = qrData.qrCode;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                  className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  {t("downloadQR")}
+                </button>
+                <button
+                  onClick={() => setShowQRModal(false)}
+                  className="flex-1 bg-gray-100 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  {t("close")}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
