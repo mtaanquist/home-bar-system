@@ -31,13 +31,22 @@ const DrinkCard: React.FC<DrinkCardProps> = ({
     )}
     <div className="p-4">
       <h3 className="font-semibold text-gray-800 mb-2">{drink.title}</h3>
+      
+      {/* Show guest description if available */}
+      {drink.guest_description && (
+        <p className="text-sm text-gray-600 mb-3">{drink.guest_description}</p>
+      )}
+      
       <div className="flex flex-col space-y-2">
-        <button
-          onClick={() => onViewRecipe(drink)}
-          className="w-full bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-200 transition-colors"
-        >
-          {t("viewRecipe")}
-        </button>
+        {/* Only show view recipe button if recipe is available to guests */}
+        {drink.recipe && (
+          <button
+            onClick={() => onViewRecipe(drink)}
+            className="w-full bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+          >
+            {t("viewRecipe")}
+          </button>
+        )}
         <button
           onClick={() => onOrder(drink)}
           disabled={disabled || loading}

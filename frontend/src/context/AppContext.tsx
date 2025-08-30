@@ -22,6 +22,8 @@ export interface Drink {
   in_stock: boolean;
   created_at: string;
   base_spirit?: string;
+  guest_description?: string;
+  show_recipe_to_guests?: boolean;
 }
 
 export interface Order {

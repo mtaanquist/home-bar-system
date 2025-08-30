@@ -54,6 +54,35 @@ router.get("/bar/:barId", (req, res) => {
   }
 });
 
+// Get drinks for guests (filtered based on guest settings)
+router.get("/bar/:barId/guest", (req, res) => {
+  try {
+    const barId = req.params.barId;
+
+    const stmt = db.prepare(
+      "SELECT * FROM drinks WHERE bar_id = ? ORDER BY created_at DESC"
+    );
+    const drinks = stmt.all(barId);
+
+    // Filter drinks for guest access
+    const guestDrinks = drinks.map(drink => {
+      if (!drink.show_recipe_to_guests) {
+        // Hide recipe from guests if not allowed
+        return {
+          ...drink,
+          recipe: null // Don't show recipe to guests
+        };
+      }
+      return drink; // Show full drink including recipe
+    });
+
+    res.json(guestDrinks);
+  } catch (error) {
+    console.error("Error fetching drinks for guests:", error);
+    res.status(500).json({ error: "Failed to fetch drinks" });
+  }
+});
+
 // Get single drink
 router.get("/bar/:barId/drink/:drinkId", (req, res) => {
   try {
@@ -97,7 +126,7 @@ router.post("/upload-image", upload.single("image"), (req, res) => {
 // Create new drink
 router.post("/", (req, res) => {
   try {
-    const { barId, title, imageUrl, recipe, baseSpirit } = req.body;
+    const { barId, title, imageUrl, recipe, baseSpirit, guestDescription, showRecipeToGuests } = req.body;
 
     if (!barId || !title || !recipe) {
       return res
@@ -114,8 +143,8 @@ router.post("/", (req, res) => {
     }
 
     const stmt = db.prepare(`
-      INSERT INTO drinks (bar_id, title, image_url, recipe, in_stock, base_spirit)
-      VALUES (?, ?, ?, ?, 1, ?)
+      INSERT INTO drinks (bar_id, title, image_url, recipe, in_stock, base_spirit, guest_description, show_recipe_to_guests)
+      VALUES (?, ?, ?, ?, 1, ?, ?, ?)
     `);
 
     const result = stmt.run(
@@ -123,7 +152,9 @@ router.post("/", (req, res) => {
       title.trim(),
       imageUrl || null,
       recipe.trim(),
-      baseSpirit || null
+      baseSpirit || null,
+      guestDescription || null,
+      showRecipeToGuests ? 1 : 0
     );
 
     // Return the created drink
@@ -141,7 +172,7 @@ router.post("/", (req, res) => {
 router.put("/:drinkId", (req, res) => {
   try {
     const drinkId = req.params.drinkId;
-    const { barId, title, imageUrl, recipe, inStock, baseSpirit } = req.body;
+    const { barId, title, imageUrl, recipe, inStock, baseSpirit, guestDescription, showRecipeToGuests } = req.body;
 
     if (!barId) {
       return res.status(400).json({ error: "Bar ID is required" });
@@ -180,6 +211,14 @@ router.put("/:drinkId", (req, res) => {
     if (baseSpirit !== undefined) {
       updates.push("base_spirit = ?");
       values.push(baseSpirit || null);
+    }
+    if (guestDescription !== undefined) {
+      updates.push("guest_description = ?");
+      values.push(guestDescription || null);
+    }
+    if (showRecipeToGuests !== undefined) {
+      updates.push("show_recipe_to_guests = ?");
+      values.push(showRecipeToGuests ? 1 : 0);
     }
 
     if (updates.length === 0) {

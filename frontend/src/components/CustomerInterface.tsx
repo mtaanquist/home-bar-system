@@ -40,7 +40,8 @@ const CustomerInterface: React.FC = () => {
   const fetchDrinks = async () => {
     if (!currentBar) return;
     try {
-      const data = await apiCall(`/drinks/bar/${currentBar.id}`);
+      // Use guest endpoint to get drinks with proper filtering
+      const data = await apiCall(`/drinks/bar/${currentBar.id}/guest`);
       setDrinks(data);
     } catch (err) {
       console.error("Error fetching drinks:", err);
