@@ -65,6 +65,7 @@ export interface TranslationMap {
   orderThis: string;
   tryAnother: string;
   pastOrders: string; // Added
+  favourites: string; // Added
   reorder: string; // Added
   status: string; // Added
 
@@ -154,6 +155,7 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     orderThis: "Order this!",
     tryAnother: "Try another",
     pastOrders: "Past Orders", // Added
+    favourites: "Favourites", // Added
     reorder: "Reorder", // Added
     status: "Status", // Added
 
@@ -241,6 +243,7 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     orderThis: "Bestil denne!",
     tryAnother: "Prøv en anden",
     pastOrders: "Tidligere bestillinger", // Added
+    favourites: "Favoritter", // Added
     reorder: "Bestil igen", // Added
     status: "Status", // Added
 

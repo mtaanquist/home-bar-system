@@ -364,4 +364,124 @@ router.get("/bar/:barId/analytics", (req, res) => {
   }
 });
 
+// Get user's favourite drinks
+router.get("/bar/:barId/favourites/:customerName", (req, res) => {
+  try {
+    const { barId, customerName } = req.params;
+
+    const stmt = db.prepare(`
+      SELECT d.*, uf.created_at as favourited_at
+      FROM drinks d
+      INNER JOIN user_favourites uf ON d.id = uf.drink_id
+      WHERE uf.bar_id = ? AND uf.customer_name = ? AND d.in_stock = 1
+      ORDER BY uf.created_at DESC
+    `);
+    const favourites = stmt.all(barId, customerName);
+
+    res.json(favourites);
+  } catch (error) {
+    console.error("Error fetching user favourites:", error);
+    res.status(500).json({ error: "Failed to fetch favourites" });
+  }
+});
+
+// Add drink to user's favourites
+router.post("/bar/:barId/favourites", (req, res) => {
+  try {
+    const { barId } = req.params;
+    const { customerName, drinkId } = req.body;
+
+    if (!customerName || !drinkId) {
+      return res.status(400).json({ error: "Customer name and drink ID are required" });
+    }
+
+    // Verify drink exists and belongs to the bar
+    const drinkStmt = db.prepare("SELECT * FROM drinks WHERE id = ? AND bar_id = ?");
+    const drink = drinkStmt.get(drinkId, barId);
+
+    if (!drink) {
+      return res.status(404).json({ error: "Drink not found" });
+    }
+
+    // Add to favourites (will ignore if already exists due to UNIQUE constraint)
+    const stmt = db.prepare(`
+      INSERT OR IGNORE INTO user_favourites (bar_id, customer_name, drink_id)
+      VALUES (?, ?, ?)
+    `);
+    const result = stmt.run(barId, customerName, drinkId);
+
+    if (result.changes === 0) {
+      return res.status(409).json({ error: "Drink already in favourites" });
+    }
+
+    res.status(201).json({ success: true, message: "Drink added to favourites" });
+  } catch (error) {
+    console.error("Error adding to favourites:", error);
+    res.status(500).json({ error: "Failed to add to favourites" });
+  }
+});
+
+// Remove drink from user's favourites
+router.delete("/bar/:barId/favourites", (req, res) => {
+  try {
+    const { barId } = req.params;
+    const { customerName, drinkId } = req.body;
+
+    if (!customerName || !drinkId) {
+      return res.status(400).json({ error: "Customer name and drink ID are required" });
+    }
+
+    const stmt = db.prepare(`
+      DELETE FROM user_favourites 
+      WHERE bar_id = ? AND customer_name = ? AND drink_id = ?
+    `);
+    const result = stmt.run(barId, customerName, drinkId);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: "Favourite not found" });
+    }
+
+    res.json({ success: true, message: "Drink removed from favourites" });
+  } catch (error) {
+    console.error("Error removing from favourites:", error);
+    res.status(500).json({ error: "Failed to remove from favourites" });
+  }
+});
+
+// Get drinks with favourite status for a customer
+router.get("/bar/:barId/guest/:customerName", (req, res) => {
+  try {
+    const { barId, customerName } = req.params;
+
+    const stmt = db.prepare(`
+      SELECT d.*, 
+             CASE WHEN uf.drink_id IS NOT NULL THEN 1 ELSE 0 END as is_favourite
+      FROM drinks d
+      LEFT JOIN user_favourites uf ON d.id = uf.drink_id 
+                                   AND uf.bar_id = d.bar_id 
+                                   AND uf.customer_name = ?
+      WHERE d.bar_id = ?
+      ORDER BY d.created_at DESC
+    `);
+    const drinks = stmt.all(customerName, barId);
+
+    // Filter drinks for guest access
+    const guestDrinks = drinks.map(drink => {
+      if (!drink.show_recipe_to_guests) {
+        // Hide recipe from guests if not allowed
+        return {
+          ...drink,
+          recipe: null // Don't show recipe to guests
+        };
+      }
+      return drink; // Show full drink including recipe
+    });
+
+    res.json(guestDrinks);
+  } catch (error) {
+    console.error("Error fetching drinks for guest with favourites:", error);
+    res.status(500).json({ error: "Failed to fetch drinks" });
+  }
+});
+
 export default router;
