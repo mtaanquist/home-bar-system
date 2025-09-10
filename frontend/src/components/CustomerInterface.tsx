@@ -416,7 +416,7 @@ const CustomerInterface: React.FC = () => {
                     {favouriteDrinks.map((drink) => (
                       <DrinkCard
                         key={drink.id}
-                        drink={{ ...drink, is_favourite: true }}
+                        drink={drink}
                         onViewRecipe={setViewingRecipe}
                         onOrder={handlePlaceOrder}
                         onToggleFavourite={handleToggleFavourite}

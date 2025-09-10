@@ -1,4 +1,4 @@
--- Migration: Create user favourites table for per-guest favorites
+-- Migration: Create user favourites table for per-guest favourites
 CREATE TABLE IF NOT EXISTS user_favourites (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     bar_id INTEGER NOT NULL,
