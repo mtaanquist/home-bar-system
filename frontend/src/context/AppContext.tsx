@@ -13,6 +13,13 @@ export interface Bar {
   language: string;
 }
 
+export interface Category {
+  id: number;
+  bar_id: number;
+  name: string;
+  created_at: string;
+}
+
 export interface Drink {
   id: number;
   bar_id: number;
@@ -25,6 +32,8 @@ export interface Drink {
   guest_description?: string;
   show_recipe_to_guests?: boolean;
   is_favourite?: boolean; // Added for favourite status
+  category_id?: number;
+  category_name?: string;
 }
 
 export interface Order {
@@ -69,12 +78,13 @@ interface AppContextType {
   drinks: Drink[];
   orders: Order[];
   analytics: Analytics | null;
+  categories: Category[];
 
   // UI states
   editingDrink: Drink | {} | null;
   viewingRecipe: Drink | null;
   showPassword: boolean;
-  currentTab: "orders" | "menu" | "analytics";
+  currentTab: "orders" | "menu" | "analytics" | "categories";
 
   // Setters
   setUserType: (type: "bartender" | "guest" | null) => void;
@@ -97,10 +107,11 @@ interface AppContextType {
   setDrinks: React.Dispatch<React.SetStateAction<Drink[]>>;
   setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
   setAnalytics: React.Dispatch<React.SetStateAction<Analytics | null>>;
+  setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
   setEditingDrink: (drink: Drink | {} | null) => void;
   setViewingRecipe: (drink: Drink | null) => void;
   setShowPassword: (show: boolean) => void;
-  setCurrentTab: (tab: "orders" | "menu" | "analytics") => void;
+  setCurrentTab: (tab: "orders" | "menu" | "analytics" | "categories") => void;
 
   // API helper
   apiCall: (endpoint: string, options?: RequestInit) => Promise<any>;
@@ -161,7 +172,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   );
 
   const [currentTab, setCurrentTabState] = useState<
-    "orders" | "menu" | "analytics"
+    "orders" | "menu" | "analytics" | "categories"
   >(() => loadFromStorage(STORAGE_KEYS.currentTab, "orders"));
 
   // Wrapper functions that save to storage
@@ -197,7 +208,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     saveToStorage(STORAGE_KEYS.language, lang);
   };
 
-  const setCurrentTab = (tab: "orders" | "menu" | "analytics") => {
+  const setCurrentTab = (tab: "orders" | "menu" | "analytics" | "categories") => {
     setCurrentTabState(tab);
     saveToStorage(STORAGE_KEYS.currentTab, tab);
   };
@@ -219,6 +230,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
   const [drinks, setDrinks] = useState<Drink[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   // UI states
   const [editingDrink, setEditingDrink] = useState<Drink | {} | null>(null);
@@ -325,6 +337,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     drinks,
     orders,
     analytics,
+    categories,
 
     // UI states
     editingDrink,
@@ -344,6 +357,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     setDrinks,
     setOrders,
     setAnalytics,
+    setCategories,
     setEditingDrink,
     setViewingRecipe,
     setShowPassword,

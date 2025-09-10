@@ -13,6 +13,7 @@ import barRoutes from "./routes/bars.js";
 import drinkRoutes from "./routes/drinks.js";
 import orderRoutes from "./routes/orders.js";
 import authRoutes from "./routes/auth.js";
+import categoryRoutes from "./routes/categories.js";
 
 // WebSocket handler
 import { setupWebSocket } from "./websocket/handler.js";
@@ -91,6 +92,7 @@ app.use("/api/bars", barRoutes);
 app.use("/api/drinks", drinkRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

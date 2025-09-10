@@ -16,6 +16,8 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
     currentBar,
     language,
     loading,
+    categories,
+    setCategories,
     setDrinks,
     setLoading,
     setError,
@@ -32,9 +34,27 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
     baseSpirit: "base_spirit" in drink ? drink.base_spirit || "" : "",
     guestDescription: "guest_description" in drink ? drink.guest_description || "" : "",
     showRecipeToGuests: "show_recipe_to_guests" in drink ? drink.show_recipe_to_guests || false : false,
+    categoryId: "category_id" in drink ? drink.category_id || "" : "",
   });
 
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Fetch categories when component mounts
+  useEffect(() => {
+    if (currentBar) {
+      fetchCategories();
+    }
+  }, [currentBar]);
+
+  const fetchCategories = async () => {
+    if (!currentBar) return;
+    try {
+      const data = await apiCall(`/categories/bar/${currentBar.id}`);
+      setCategories(data);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -110,6 +130,7 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
             baseSpirit: formData.baseSpirit.trim(),
             guestDescription: formData.guestDescription.trim() || null,
             showRecipeToGuests: formData.showRecipeToGuests,
+            categoryId: formData.categoryId || null,
           }),
         });
 
@@ -128,6 +149,7 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
             baseSpirit: formData.baseSpirit.trim(),
             guestDescription: formData.guestDescription.trim() || null,
             showRecipeToGuests: formData.showRecipeToGuests,
+            categoryId: formData.categoryId || null,
           }),
         });
 
@@ -217,6 +239,30 @@ const DrinkForm: React.FC<DrinkFormProps> = ({ drink, onClose }) => {
                   <option value="Liqueur">Liqueur</option>
                   <option value="Non-alcoholic">Non-alcoholic</option>
                   <option value="Other">Other</option>
+                </select>
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
+                <select
+                  value={formData.categoryId}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      categoryId: e.target.value,
+                    }))
+                  }
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">No category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 

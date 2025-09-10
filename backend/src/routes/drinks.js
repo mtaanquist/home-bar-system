@@ -42,9 +42,13 @@ router.get("/bar/:barId", (req, res) => {
   try {
     const barId = req.params.barId;
 
-    const stmt = db.prepare(
-      "SELECT * FROM drinks WHERE bar_id = ? ORDER BY created_at DESC"
-    );
+    const stmt = db.prepare(`
+      SELECT d.*, c.name as category_name 
+      FROM drinks d 
+      LEFT JOIN categories c ON d.category_id = c.id 
+      WHERE d.bar_id = ? 
+      ORDER BY d.created_at DESC
+    `);
     const drinks = stmt.all(barId);
 
     res.json(drinks);
@@ -59,9 +63,13 @@ router.get("/bar/:barId/guest", (req, res) => {
   try {
     const barId = req.params.barId;
 
-    const stmt = db.prepare(
-      "SELECT * FROM drinks WHERE bar_id = ? ORDER BY created_at DESC"
-    );
+    const stmt = db.prepare(`
+      SELECT d.*, c.name as category_name 
+      FROM drinks d 
+      LEFT JOIN categories c ON d.category_id = c.id 
+      WHERE d.bar_id = ? 
+      ORDER BY d.created_at DESC
+    `);
     const drinks = stmt.all(barId);
 
     // Filter drinks for guest access
@@ -126,7 +134,7 @@ router.post("/upload-image", upload.single("image"), (req, res) => {
 // Create new drink
 router.post("/", (req, res) => {
   try {
-    const { barId, title, imageUrl, recipe, baseSpirit, guestDescription, showRecipeToGuests } = req.body;
+    const { barId, title, imageUrl, recipe, baseSpirit, guestDescription, showRecipeToGuests, categoryId } = req.body;
 
     if (!barId || !title || !recipe) {
       return res
@@ -142,9 +150,19 @@ router.post("/", (req, res) => {
       return res.status(404).json({ error: "Bar not found" });
     }
 
+    // Verify category exists if provided
+    if (categoryId) {
+      const categoryStmt = db.prepare("SELECT id FROM categories WHERE id = ? AND bar_id = ?");
+      const category = categoryStmt.get(categoryId, barId);
+      
+      if (!category) {
+        return res.status(400).json({ error: "Category not found" });
+      }
+    }
+
     const stmt = db.prepare(`
-      INSERT INTO drinks (bar_id, title, image_url, recipe, in_stock, base_spirit, guest_description, show_recipe_to_guests)
-      VALUES (?, ?, ?, ?, 1, ?, ?, ?)
+      INSERT INTO drinks (bar_id, title, image_url, recipe, in_stock, base_spirit, guest_description, show_recipe_to_guests, category_id)
+      VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?)
     `);
 
     const result = stmt.run(
@@ -154,7 +172,8 @@ router.post("/", (req, res) => {
       recipe.trim(),
       baseSpirit || null,
       guestDescription || null,
-      showRecipeToGuests ? 1 : 0
+      showRecipeToGuests ? 1 : 0,
+      categoryId || null
     );
 
     // Return the created drink
@@ -172,7 +191,7 @@ router.post("/", (req, res) => {
 router.put("/:drinkId", (req, res) => {
   try {
     const drinkId = req.params.drinkId;
-    const { barId, title, imageUrl, recipe, inStock, baseSpirit, guestDescription, showRecipeToGuests } = req.body;
+    const { barId, title, imageUrl, recipe, inStock, baseSpirit, guestDescription, showRecipeToGuests, categoryId } = req.body;
 
     if (!barId) {
       return res.status(400).json({ error: "Bar ID is required" });
@@ -186,6 +205,16 @@ router.put("/:drinkId", (req, res) => {
 
     if (!existingDrink) {
       return res.status(404).json({ error: "Drink not found" });
+    }
+
+    // Verify category exists if provided
+    if (categoryId) {
+      const categoryStmt = db.prepare("SELECT id FROM categories WHERE id = ? AND bar_id = ?");
+      const category = categoryStmt.get(categoryId, barId);
+      
+      if (!category) {
+        return res.status(400).json({ error: "Category not found" });
+      }
     }
 
     // Build update query dynamically based on provided fields
@@ -219,6 +248,10 @@ router.put("/:drinkId", (req, res) => {
     if (showRecipeToGuests !== undefined) {
       updates.push("show_recipe_to_guests = ?");
       values.push(showRecipeToGuests ? 1 : 0);
+    }
+    if (categoryId !== undefined) {
+      updates.push("category_id = ?");
+      values.push(categoryId || null);
     }
 
     if (updates.length === 0) {
@@ -370,8 +403,12 @@ router.get("/bar/:barId/favourites/:customerName", (req, res) => {
     const { barId, customerName } = req.params;
 
     const stmt = db.prepare(`
-      SELECT d.*, uf.created_at as favourited_at
+      SELECT d.*, 
+             c.name as category_name,
+             uf.created_at as favourited_at,
+             1 as is_favourite
       FROM drinks d
+      LEFT JOIN categories c ON d.category_id = c.id
       INNER JOIN user_favourites uf ON d.id = uf.drink_id
       WHERE uf.bar_id = ? AND uf.customer_name = ? AND d.in_stock = 1
       ORDER BY uf.created_at DESC
@@ -455,8 +492,10 @@ router.get("/bar/:barId/guest/:customerName", (req, res) => {
 
     const stmt = db.prepare(`
       SELECT d.*, 
+             c.name as category_name,
              CASE WHEN uf.drink_id IS NOT NULL THEN 1 ELSE 0 END as is_favourite
       FROM drinks d
+      LEFT JOIN categories c ON d.category_id = c.id
       LEFT JOIN user_favourites uf ON d.id = uf.drink_id 
                                    AND uf.bar_id = d.bar_id 
                                    AND uf.customer_name = ?

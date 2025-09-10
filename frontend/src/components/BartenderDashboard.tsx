@@ -6,6 +6,7 @@ import { useSessionManager } from "../hooks/useSessionManager";
 import OrdersTab from "./OrdersTab";
 import MenuTab from "./MenuTab";
 import AnalyticsTab from "./AnalyticsTab";
+import CategoriesTab from "./CategoriesTab";
 
 const BartenderDashboard: React.FC = () => {
   const {
@@ -166,6 +167,16 @@ const BartenderDashboard: React.FC = () => {
             >
               {t("analytics")}
             </button>
+            <button
+              onClick={() => setCurrentTab("categories")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                currentTab === "categories"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Categories
+            </button>
           </nav>
         </div>
       </div>
@@ -175,6 +186,7 @@ const BartenderDashboard: React.FC = () => {
         {currentTab === "orders" && <OrdersTab />}
         {currentTab === "menu" && <MenuTab />}
         {currentTab === "analytics" && <AnalyticsTab />}
+        {currentTab === "categories" && <CategoriesTab />}
       </div>
 
       {/* Floating Action Button for Mobile */}

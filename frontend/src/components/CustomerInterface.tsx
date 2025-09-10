@@ -36,6 +36,12 @@ const CustomerInterface: React.FC = () => {
   // Favourites state
   const [favouriteDrinks, setFavouriteDrinks] = useState<Drink[]>([]);
 
+  // Filter state
+  const [activeFilter, setActiveFilter] = useState<{
+    type: "all" | "category" | "spirit";
+    value?: string;
+  }>({ type: "all" });
+
   // Tab state for mobile - no longer needed since we navigate to separate page
   // const [mobileTab, setMobileTab] = useState<"menu" | "history">("menu");
 
@@ -95,6 +101,17 @@ const CustomerInterface: React.FC = () => {
       groupedDrinks[spirit].push(drink);
     }
   });
+  
+  // Group available drinks by category
+  const groupedByCategory: { [category: string]: typeof drinks } = {};
+  drinks.forEach((drink) => {
+    if (drink.in_stock) {
+      const category = drink.category_name || "Uncategorized";
+      if (!groupedByCategory[category]) groupedByCategory[category] = [];
+      groupedByCategory[category].push(drink);
+    }
+  });
+  
   const baseSpiritOrder = [
     "Vodka",
     "Gin",
@@ -109,6 +126,21 @@ const CustomerInterface: React.FC = () => {
   const spiritsWithDrinks = baseSpiritOrder.filter(
     (spirit) => groupedDrinks[spirit] && groupedDrinks[spirit].length > 0
   );
+  
+  const categoriesWithDrinks = Object.keys(groupedByCategory).sort();
+
+  // Filter drinks based on active filter
+  const getFilteredDrinks = () => {
+    if (activeFilter.type === "category" && activeFilter.value) {
+      return groupedByCategory[activeFilter.value] || [];
+    } else if (activeFilter.type === "spirit" && activeFilter.value) {
+      return groupedDrinks[activeFilter.value] || [];
+    }
+    // For "all", we don't return anything because we'll show the grouped sections
+    return [];
+  };
+
+  const filteredDrinks = getFilteredDrinks();
 
   const handlePlaceOrder = async (drink: Drink) => {
     if (customerOrder) {
@@ -362,7 +394,7 @@ const CustomerInterface: React.FC = () => {
 
       {/* Main content container with left menu and main area */}
       <div className="max-w-4xl mx-auto px-4 py-6 flex space-x-6">
-        {/* Left-hand menu for base spirits (desktop only) */}
+        {/* Left-hand menu for filtering (desktop only) */}
         <nav className="hidden md:block w-48 sticky top-24 self-start">
           <ul className="space-y-2">
             <li>
@@ -376,6 +408,22 @@ const CustomerInterface: React.FC = () => {
                 🎲 {t("surpriseMe")}
               </button>
             </li>
+            
+            {/* Show All Filter */}
+            <li>
+              <button
+                onClick={() => setActiveFilter({ type: "all" })}
+                className={`w-full text-left px-3 py-2 rounded font-medium transition-colors ${
+                  activeFilter.type === "all"
+                    ? "bg-blue-100 text-blue-700"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}
+              >
+                📋 All Drinks
+              </button>
+            </li>
+
+            {/* Favourites - always visible when available */}
             {favouriteDrinks.length > 0 && (
               <li>
                 <a
@@ -386,14 +434,56 @@ const CustomerInterface: React.FC = () => {
                 </a>
               </li>
             )}
+
+            {/* Categories Filter */}
+            {categoriesWithDrinks.length > 0 && (
+              <>
+                <li className="py-2">
+                  <hr className="border-gray-300" />
+                </li>
+                <li>
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase">
+                    Categories
+                  </div>
+                </li>
+                {categoriesWithDrinks.map((category) => (
+                  <li key={category}>
+                    <button
+                      onClick={() => setActiveFilter({ type: "category", value: category })}
+                      className={`w-full text-left px-3 py-2 rounded font-medium transition-colors ${
+                        activeFilter.type === "category" && activeFilter.value === category
+                          ? "bg-green-100 text-green-700"
+                          : "hover:bg-green-50 text-gray-700"
+                      }`}
+                    >
+                      📁 {category} ({groupedByCategory[category].length})
+                    </button>
+                  </li>
+                ))}
+                <li className="py-2">
+                  <hr className="border-gray-300" />
+                </li>
+                <li>
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 uppercase">
+                    Base Spirits
+                  </div>
+                </li>
+              </>
+            )}
+
+            {/* Base Spirits Filter */}
             {spiritsWithDrinks.map((spirit) => (
               <li key={spirit}>
-                <a
-                  href={`#spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
-                  className="block px-3 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium"
+                <button
+                  onClick={() => setActiveFilter({ type: "spirit", value: spirit })}
+                  className={`w-full text-left px-3 py-2 rounded font-medium transition-colors ${
+                    activeFilter.type === "spirit" && activeFilter.value === spirit
+                      ? "bg-blue-100 text-blue-700"
+                      : "hover:bg-blue-50 text-gray-700"
+                  }`}
                 >
-                  {spirit}
-                </a>
+                  {spirit} ({groupedDrinks[spirit].length})
+                </button>
               </li>
             ))}
           </ul>
@@ -401,11 +491,48 @@ const CustomerInterface: React.FC = () => {
 
         {/* Main drink/order content */}
         <div className="flex-1 space-y-8">
-          {/* Mobile header - no tab navigation needed since Past Orders is now in header */}
-          <div className="md:hidden mb-4">
+          {/* Mobile header with filter */}
+          <div className="md:hidden mb-4 space-y-4">
             <h2 className="text-lg font-bold text-blue-800 text-center py-2">
               {t("availableDrinks")}
             </h2>
+            
+            {/* Mobile Filter Dropdown */}
+            <div className="px-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Filter Drinks
+              </label>
+              <select
+                value={activeFilter.type === "all" ? "all" : `${activeFilter.type}:${activeFilter.value}`}
+                onChange={(e) => {
+                  const [type, value] = e.target.value.split(':');
+                  if (type === "all") {
+                    setActiveFilter({ type: "all" });
+                  } else {
+                    setActiveFilter({ type: type as "category" | "spirit", value });
+                  }
+                }}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">📋 All Drinks</option>
+                {categoriesWithDrinks.length > 0 && (
+                  <optgroup label="Categories">
+                    {categoriesWithDrinks.map((category) => (
+                      <option key={category} value={`category:${category}`}>
+                        📁 {category} ({groupedByCategory[category].length})
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                <optgroup label="Base Spirits">
+                  {spiritsWithDrinks.map((spirit) => (
+                    <option key={spirit} value={`spirit:${spirit}`}>
+                      {spirit} ({groupedDrinks[spirit].length})
+                    </option>
+                  ))}
+                </optgroup>
+              </select>
+            </div>
           </div>
 
           {/* Current Order Status */}
@@ -423,14 +550,14 @@ const CustomerInterface: React.FC = () => {
           {/* Past Orders Section - removed since it's now a separate page */}
 
           {/* Grouped Available Drinks */}
-          {spiritsWithDrinks.length === 0 && favouriteDrinks.length === 0 ? (
+          {spiritsWithDrinks.length === 0 && favouriteDrinks.length === 0 && categoriesWithDrinks.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <Coffee className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p>No drinks available right now</p>
             </div>
           ) : (
             <>
-              {/* Favourites Section */}
+              {/* Favourites Section - Always show when available */}
               {favouriteDrinks.length > 0 && (
                 <section
                   id="favourites"
@@ -456,17 +583,14 @@ const CustomerInterface: React.FC = () => {
                 </section>
               )}
               
-              {spiritsWithDrinks.map((spirit) => (
-                <section
-                  key={spirit}
-                  id={`spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
-                  className="scroll-mt-24"
-                >
-                  <h2 className="text-2xl font-bold text-blue-800 mb-4">
-                    {spirit}
+              {/* Filtered Drinks Section */}
+              {activeFilter.type === "category" && activeFilter.value && (
+                <section className="scroll-mt-24">
+                  <h2 className="text-2xl font-bold text-green-700 mb-4">
+                    📁 {activeFilter.value}
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupedDrinks[spirit].map((drink) => (
+                    {filteredDrinks.map((drink) => (
                       <DrinkCard
                         key={drink.id}
                         drink={drink}
@@ -480,7 +604,88 @@ const CustomerInterface: React.FC = () => {
                     ))}
                   </div>
                 </section>
-              ))}
+              )}
+
+              {activeFilter.type === "spirit" && activeFilter.value && (
+                <section className="scroll-mt-24">
+                  <h2 className="text-2xl font-bold text-blue-800 mb-4">
+                    {activeFilter.value}
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredDrinks.map((drink) => (
+                      <DrinkCard
+                        key={drink.id}
+                        drink={drink}
+                        onViewRecipe={setViewingRecipe}
+                        onOrder={handlePlaceOrder}
+                        onToggleFavourite={handleToggleFavourite}
+                        disabled={!!customerOrder || loading}
+                        loading={loading}
+                        t={t}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Show All Categories and Spirits - only when filter is "all" */}
+              {activeFilter.type === "all" && (
+                <>
+                  {/* Categories Sections */}
+                  {categoriesWithDrinks.map((category) => (
+                    <section
+                      key={category}
+                      id={`category-${category.replace(/[^a-zA-Z0-9]/g, "")}`}
+                      className="scroll-mt-24"
+                    >
+                      <h2 className="text-2xl font-bold text-green-700 mb-4">
+                        📁 {category}
+                      </h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {groupedByCategory[category].map((drink) => (
+                          <DrinkCard
+                            key={drink.id}
+                            drink={drink}
+                            onViewRecipe={setViewingRecipe}
+                            onOrder={handlePlaceOrder}
+                            onToggleFavourite={handleToggleFavourite}
+                            disabled={!!customerOrder || loading}
+                            loading={loading}
+                            t={t}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  ))}
+                  
+                  {/* Base Spirits Sections */}
+                  {spiritsWithDrinks.map((spirit) => (
+                    <section
+                      key={spirit}
+                      id={`spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
+                      className="scroll-mt-24"
+                    >
+                      <h2 className="text-2xl font-bold text-blue-800 mb-4">
+                        {spirit}
+                      </h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {groupedDrinks[spirit].map((drink) => (
+                          <DrinkCard
+                            key={drink.id}
+                            drink={drink}
+                            onViewRecipe={setViewingRecipe}
+                            onOrder={handlePlaceOrder}
+                            onToggleFavourite={handleToggleFavourite}
+                            disabled={!!customerOrder || loading}
+                            loading={loading}
+                            t={t}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  ))}
+                </>
+              )}
             </>
           )}
         </div>
