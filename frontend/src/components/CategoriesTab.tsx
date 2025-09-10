@@ -16,6 +16,7 @@ const CategoriesTab: React.FC = () => {
   } = useApp();
 
   const t = useTranslation(language);
+  // TODO: Add translation keys for categories functionality
 
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -169,7 +170,7 @@ const CategoriesTab: React.FC = () => {
                 }}
                 className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </form>
@@ -256,6 +257,14 @@ interface EditCategoryFormProps {
   loading: boolean;
 }
 
+// EditCategoryForm component
+interface EditCategoryFormProps {
+  category: Category;
+  onSave: (newName: string) => void;
+  onCancel: () => void;
+  loading: boolean;
+}
+
 const EditCategoryForm: React.FC<EditCategoryFormProps> = ({
   category,
   onSave,
@@ -263,6 +272,8 @@ const EditCategoryForm: React.FC<EditCategoryFormProps> = ({
   loading,
 }) => {
   const [name, setName] = useState(category.name);
+  const { language } = useApp();
+  const t = useTranslation(language);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -289,14 +300,14 @@ const EditCategoryForm: React.FC<EditCategoryFormProps> = ({
           disabled={loading || !name.trim() || name.trim() === category.name}
           className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? "Saving..." : "Save"}
+          {loading ? "Saving..." : t("save")}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded text-sm hover:bg-gray-200 transition-colors"
         >
-          Cancel
+          {t("cancel")}
         </button>
       </div>
     </form>
