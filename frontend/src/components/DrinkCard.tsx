@@ -22,7 +22,7 @@ const DrinkCard: React.FC<DrinkCardProps> = ({
   loading,
   t,
 }) => (
-  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+  <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-md dark:hover:shadow-gray-900/20 transition-shadow">
     {drink.image_url && (
       <div className="aspect-video overflow-hidden">
         <img
@@ -34,11 +34,11 @@ const DrinkCard: React.FC<DrinkCardProps> = ({
     )}
     <div className="p-4">
       <div className="flex items-start justify-between mb-2">
-        <h3 className="font-semibold text-gray-800 flex-1">{drink.title}</h3>
+        <h3 className="font-semibold text-gray-800 dark:text-white flex-1">{drink.title}</h3>
         {onToggleFavourite && (
           <button
             onClick={() => onToggleFavourite(drink)}
-            className="ml-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+            className="ml-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             title={drink.is_favourite ? "Remove from favourites" : "Add to favourites"}
           >
             <Star 
@@ -54,7 +54,7 @@ const DrinkCard: React.FC<DrinkCardProps> = ({
       
       {/* Show guest description if available */}
       {drink.guest_description && (
-        <p className="text-sm text-gray-600 mb-3">{drink.guest_description}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{drink.guest_description}</p>
       )}
       
       <div className="flex flex-col space-y-2">
@@ -62,7 +62,7 @@ const DrinkCard: React.FC<DrinkCardProps> = ({
         {drink.recipe && (
           <button
             onClick={() => onViewRecipe(drink)}
-            className="w-full bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+            className="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
           >
             {t("viewRecipe")}
           </button>

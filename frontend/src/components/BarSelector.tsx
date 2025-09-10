@@ -41,11 +41,11 @@ const BarSelector: React.FC<BarSelectorProps> = ({
       {availableBars.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-gray-700">Select Existing Bar</h4>
+            <h4 className="font-semibold text-gray-700 dark:text-gray-300">Select Existing Bar</h4>
             <button
               onClick={fetchBars}
               disabled={loadingBars}
-              className="p-1 text-gray-500 hover:text-gray-700"
+              className="p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               title="Refresh bars list"
             >
               <RefreshCw
@@ -58,10 +58,10 @@ const BarSelector: React.FC<BarSelectorProps> = ({
               <button
                 key={bar.id}
                 onClick={() => onSelectBar(bar)}
-                className="w-full p-3 text-left border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors"
+                className="bar-selector-item w-full p-3 text-left border border-gray-200 dark:border-gray-600 rounded-lg hover:border-purple-300 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
               >
-                <div className="font-medium text-gray-800">{bar.name}</div>
-                <div className="text-sm text-gray-500">
+                <div className="font-medium text-gray-800 dark:text-white">{bar.name}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                   ID: {bar.id} • Language: {bar.language.toUpperCase()}
                 </div>
               </button>
@@ -74,10 +74,10 @@ const BarSelector: React.FC<BarSelectorProps> = ({
       <div className="text-center">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
+            <div className="w-full border-t border-gray-300 dark:border-gray-600" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">or</span>
+            <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">or</span>
           </div>
         </div>
       </div>
@@ -85,7 +85,7 @@ const BarSelector: React.FC<BarSelectorProps> = ({
       {/* Create New Bar Button */}
       <button
         onClick={onCreateBar}
-        className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center justify-center space-x-2"
+        className="w-full bg-purple-600 dark:bg-purple-700 text-white py-3 rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors font-medium flex items-center justify-center space-x-2"
       >
         <Plus className="w-4 h-4" />
         <span>{t("createBar")}</span>

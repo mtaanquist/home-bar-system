@@ -82,7 +82,7 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+    <div className="landing-page-container min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-black transition-colors duration-300">
       {/* Desktop Layout */}
       <div className="hidden lg:flex min-h-screen">
         {/* Left Side - Hero Section */}
@@ -112,25 +112,28 @@ const LandingPage: React.FC = () => {
         </div>
 
         {/* Right Side - Form */}
-        <div className="w-96 bg-white flex items-center justify-center p-8">
+        <div className="landing-form-container w-96 bg-white dark:bg-gray-800 flex items-center justify-center p-8 transition-colors duration-300">
           <div className="w-full max-w-sm">
             <div className="mb-8 text-center">
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              <h3 className="landing-text text-2xl font-bold text-gray-800 dark:text-white mb-2">
                 {getTitle()}
               </h3>
-              <p className="text-gray-600">{getSubtitle()}</p>
+              <p className="landing-text text-gray-600 dark:text-gray-300">{getSubtitle()}</p>
             </div>
 
             <div className="space-y-6">
-              {/* Language Selector */}
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as "en" | "da")}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              >
-                <option value="en">English</option>
-                <option value="da">Dansk</option>
-              </select>
+              {/* Controls Row */}
+              <div className="flex gap-3">
+                {/* Language Selector */}
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as "en" | "da")}
+                  className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white transition-colors duration-200"
+                >
+                  <option value="en">English</option>
+                  <option value="da">Dansk</option>
+                </select>
+              </div>
 
               {/* Dynamic Content */}
               {renderContent()}
@@ -141,24 +144,27 @@ const LandingPage: React.FC = () => {
 
       {/* Mobile Layout */}
       <div className="lg:hidden min-h-screen flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-md transition-colors duration-300">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
               🍸 Home Bar
             </h1>
-            <p className="text-gray-600">{getSubtitle()}</p>
+            <p className="text-gray-600 dark:text-gray-300">{getSubtitle()}</p>
           </div>
 
           <div className="space-y-4">
-            {/* Language Selector */}
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value as "en" | "da")}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            >
-              <option value="en">English</option>
-              <option value="da">Dansk</option>
-            </select>
+            {/* Controls Row */}
+            <div className="flex gap-3">
+              {/* Language Selector */}
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as "en" | "da")}
+                className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white transition-colors duration-200"
+              >
+                <option value="en">English</option>
+                <option value="da">Dansk</option>
+              </select>
+            </div>
 
             {/* Dynamic Content */}
             {renderContent()}

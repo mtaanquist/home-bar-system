@@ -1,9 +1,327 @@
 @import "tailwindcss";
 
+/* Dark mode using browser preference */
+@media (prefers-color-scheme: dark) {
+  /* Landing Page Dark Mode */
+  .landing-page-container {
+    background: linear-gradient(45deg, #111827, #1f2937, #000000) !important;
+  }
+
+  .landing-form-container {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+    border-color: #374151 !important;
+  }
+
+  .landing-text {
+    color: #ffffff !important;
+  }
+
+  .bar-selector-item {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+  }
+
+  .bar-selector-item:hover {
+    background-color: #4b5563 !important;
+    border-color: #6366f1 !important;
+  }
+
+  .bar-selector-item div {
+    color: #ffffff !important;
+  }
+
+  .bar-selector-item .text-gray-500 {
+    color: #d1d5db !important;
+  }
+
+  /* Dark mode for select elements */
+  select {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+  }
+
+  select option {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+  }
+
+  /* Dark mode input fields */
+  input[type="text"],
+  input[type="password"] {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+  }
+
+  /* Bartender Dashboard Dark Mode */
+  .dashboard-container {
+    background-color: #111827 !important;
+  }
+
+  .dashboard-header {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+  }
+
+  .dashboard-nav {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+  }
+
+  .dashboard-text {
+    color: #ffffff !important;
+  }
+
+  .dashboard-text-secondary {
+    color: #d1d5db !important;
+  }
+
+  /* Customer Interface Dark Mode */
+  .customer-container {
+    background-color: #111827 !important;
+  }
+
+  .customer-header {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+  }
+
+  .customer-text {
+    color: #ffffff !important;
+  }
+
+  .customer-text-secondary {
+    color: #d1d5db !important;
+  }
+}
+
 /* Test CSS */
 .fallback-test {
   background-color: red !important;
   color: white !important;
   padding: 16px !important;
   margin: 16px 0 !important;
+}
+
+/* Comprehensive Dark Mode for All Components */
+@media (prefers-color-scheme: dark) {
+  /* Base component styling - white cards and containers */
+  .bg-white {
+    background-color: #1f2937 !important;
+  }
+  
+  /* Text colors */
+  .text-gray-900 {
+    color: #f9fafb !important;
+  }
+  
+  .text-gray-800 {
+    color: #e5e7eb !important;
+  }
+  
+  .text-gray-700 {
+    color: #d1d5db !important;
+  }
+  
+  .text-gray-600 {
+    color: #9ca3af !important;
+  }
+  
+  .text-gray-500 {
+    color: #6b7280 !important;
+  }
+  
+  .text-gray-400 {
+    color: #6b7280 !important;
+  }
+  
+  /* Border colors */
+  .border-gray-200 {
+    border-color: #374151 !important;
+  }
+  
+  .border {
+    border-color: #374151 !important;
+  }
+  
+  /* Background colors for status indicators and cards */
+  .bg-gray-50 {
+    background-color: #374151 !important;
+  }
+  
+  .bg-gray-100 {
+    background-color: #4b5563 !important;
+  }
+  
+  .bg-gray-200 {
+    background-color: #6b7280 !important;
+  }
+  
+  /* Status indicator backgrounds with transparency */
+  .bg-yellow-50 {
+    background-color: rgba(251, 191, 36, 0.1) !important;
+  }
+  
+  .bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+  }
+  
+  .bg-red-50 {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+  }
+  
+  .bg-green-50 {
+    background-color: rgba(34, 197, 94, 0.1) !important;
+  }
+  
+  /* Icon background colors */
+  .bg-blue-100 {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+  }
+  
+  .bg-green-100 {
+    background-color: rgba(34, 197, 94, 0.2) !important;
+  }
+  
+  .bg-purple-100 {
+    background-color: rgba(147, 51, 234, 0.2) !important;
+  }
+  
+  .bg-yellow-100 {
+    background-color: rgba(251, 191, 36, 0.2) !important;
+  }
+  
+  /* Shadows in dark mode */
+  .shadow-sm {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* Improved link colors */
+  .text-blue-700 {
+    color: #60a5fa !important;
+  }
+  
+  .text-blue-600 {
+    color: #3b82f6 !important;
+  }
+  
+  /* Button hover states in dark mode */
+  .hover\:bg-gray-200:hover {
+    background-color: #6b7280 !important;
+  }
+  
+  .hover\:bg-green-700:hover {
+    background-color: #15803d !important;
+  }
+  
+  /* Form elements */
+  input, textarea, select {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+  }
+  
+  input::placeholder, textarea::placeholder {
+    color: #9ca3af !important;
+  }
+  
+  /* Out of stock badges */
+  .bg-red-100 {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+  }
+  
+  .text-red-600 {
+    color: #f87171 !important;
+  }
+  
+  .text-red-700 {
+    color: #ef4444 !important;
+  }
+  
+  .text-red-800 {
+    color: #dc2626 !important;
+  }
+  
+  /* Success colors */
+  .text-green-600 {
+    color: #22c55e !important;
+  }
+  
+  .text-green-700 {
+    color: #16a34a !important;
+  }
+  
+  .text-green-800 {
+    color: #15803d !important;
+  }
+  
+  /* In stock badges */
+  .bg-green-100 {
+    background-color: rgba(34, 197, 94, 0.2) !important;
+  }
+  
+  /* Warning colors */
+  .text-yellow-600 {
+    color: #eab308 !important;
+  }
+  
+  .text-yellow-700 {
+    color: #a16207 !important;
+  }
+  
+  /* Action button colors */
+  .bg-blue-100 {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+  }
+  
+  .text-blue-700 {
+    color: #60a5fa !important;
+  }
+  
+  .text-blue-800 {
+    color: #3b82f6 !important;
+  }
+  
+  /* Hover states for action buttons */
+  .hover\:bg-blue-200:hover {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+  }
+  
+  .hover\:bg-red-200:hover {
+    background-color: rgba(239, 68, 68, 0.3) !important;
+  }
+  
+  .hover\:bg-yellow-200:hover {
+    background-color: rgba(251, 191, 36, 0.3) !important;
+  }
+  
+  .hover\:bg-green-200:hover {
+    background-color: rgba(34, 197, 94, 0.3) !important;
+  }
+  
+  /* Recipe content styling */
+  .prose-p\:text-gray-800 p {
+    color: #e5e7eb !important;
+  }
+  
+  .prose-li\:text-gray-800 li {
+    color: #e5e7eb !important;
+  }
+  
+  .prose-strong\:text-gray-900 strong {
+    color: #f9fafb !important;
+  }
+  
+  .prose-em\:text-gray-700 em {
+    color: #d1d5db !important;
+  }
+}
+
+/* Test elements for debugging */
+.test-element {
+  background-color: white !important;
+  color: black !important;
 }

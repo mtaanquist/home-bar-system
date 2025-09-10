@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./components/LandingPage";
 import BartenderDashboard from "./components/BartenderDashboard";
@@ -92,10 +92,6 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  useEffect(() => {
-    document.body.setAttribute("data-color-mode", "light");
-  }, []);
-
   return (
     <BrowserRouter>
       <AppProvider>

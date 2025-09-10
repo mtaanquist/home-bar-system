@@ -293,7 +293,7 @@ const CustomerInterface: React.FC = () => {
   }, [showRandomModal]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="customer-container min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Order Placed Modal */}
       {showOrderPlacedModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -363,31 +363,33 @@ const CustomerInterface: React.FC = () => {
         </div>
       )}
       {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-10">
+      <div className="customer-header bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10 transition-colors duration-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-xl font-bold text-gray-800">
+              <h1 className="customer-text text-xl font-bold text-gray-800 dark:text-white">
                 🍸 {currentBar?.name}
               </h1>
               <div className="flex items-center gap-4">
-                <p className="text-sm text-gray-600">
+                <p className="customer-text-secondary text-sm text-gray-600 dark:text-gray-400">
                   Welcome, {customerName}!
                 </p>
                 <button
                   onClick={() => navigate("/customer/past-orders")}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium cursor-pointer"
                 >
                   {t("pastOrders")}
                 </button>
               </div>
             </div>
-            <button
-              onClick={clearSession}
-              className="text-gray-600 hover:text-gray-800 text-sm font-medium cursor-pointer"
-            >
-              {t("logout")}
-            </button>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={clearSession}
+                className="customer-text-secondary text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 text-sm font-medium cursor-pointer"
+              >
+                {t("logout")}
+              </button>
+            </div>
           </div>
         </div>
       </div>
