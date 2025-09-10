@@ -192,7 +192,7 @@ const BartenderDashboard: React.FC = () => {
       {/* QR Code Modal */}
       {showQRModal && qrData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="text-center">
               <h3 className="text-xl font-bold text-gray-800 mb-4">
                 {t("qrCodeTitle")} {qrData.barName}
@@ -207,11 +207,34 @@ const BartenderDashboard: React.FC = () => {
               <p className="text-sm text-gray-600 mb-4">
                 {t("qrCodeInstructions")}
               </p>
-              <div className="bg-gray-50 p-3 rounded-lg mb-4">
-                <p className="text-xs text-gray-500 mb-1">{t("directLink")}</p>
-                <code className="text-xs break-all bg-white p-2 rounded border">
-                  {qrData.url}
-                </code>
+              <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                <p className="text-sm text-gray-500 mb-2">{t("directLink")}</p>
+                <div className="bg-white p-3 rounded border relative">
+                  <code className="text-sm text-gray-800 break-words block leading-relaxed pr-12">
+                    {qrData.url}
+                  </code>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(qrData.url).then(() => {
+                        // Could show a toast notification here
+                      }).catch(() => {
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = qrData.url;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                      });
+                    }}
+                    className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    title="Copy URL"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div className="flex space-x-3">
                 <button
