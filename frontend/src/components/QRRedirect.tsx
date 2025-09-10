@@ -6,7 +6,7 @@ import LoginForm from "./LoginForm";
 const QRRedirect: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { setCurrentBar, setLanguage, setCustomerName, apiCall } = useApp();
+  const { setCurrentBar, setLanguage, setCustomerName, setUserType, apiCall } = useApp();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasToken, setHasToken] = useState(false);
@@ -75,7 +75,7 @@ const QRRedirect: React.FC = () => {
     setError(null);
 
     try {
-      await apiCall(`/bars/${id}/guest-token-login`, {
+      const response = await apiCall(`/bars/${id}/guest-token-login`, {
         method: "POST",
         body: JSON.stringify({
           token,
@@ -83,8 +83,23 @@ const QRRedirect: React.FC = () => {
         }),
       });
 
-      // Set customer name in context
+      // Update app context with authentication info
       setCustomerName(guestName.trim());
+      setUserType("guest");
+      
+      // Update session activity timestamp
+      localStorage.setItem("homeBarSystem_lastActivity", Date.now().toString());
+      
+      // The current bar should already be set from the earlier fetchBarInfo call,
+      // but let's make sure it has the latest info
+      if (response.barId && response.barName && response.language) {
+        setCurrentBar({
+          id: response.barId,
+          name: response.barName,
+          language: response.language
+        });
+        setLanguage(response.language as "en" | "da");
+      }
 
       // Navigate to customer interface
       navigate("/customer");
