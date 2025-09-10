@@ -310,11 +310,11 @@ router.get("/bar/:barId/analytics", (req, res) => {
   }
 });
 
-// Delete order (admin only - for cleanup)
+// Delete order (customer cancel or admin cleanup)
 router.delete("/:orderId", (req, res) => {
   try {
     const orderId = req.params.orderId;
-    const { barId } = req.body;
+    const { barId, customerName } = req.body;
 
     if (!barId) {
       return res.status(400).json({ error: "Bar ID is required" });
@@ -328,6 +328,20 @@ router.delete("/:orderId", (req, res) => {
 
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
+    }
+
+    // If customerName is provided, verify the customer owns this order
+    // and can only cancel if order hasn't been accepted yet
+    if (customerName) {
+      if (order.customer_name !== customerName) {
+        return res.status(403).json({ error: "You can only cancel your own orders" });
+      }
+      
+      if (order.status !== "new") {
+        return res.status(400).json({ 
+          error: "You can only cancel orders that haven't been accepted yet" 
+        });
+      }
     }
 
     // Delete the order

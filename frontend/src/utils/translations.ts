@@ -45,6 +45,8 @@ export interface TranslationMap {
   showRecipeHelp: string;
   save: string;
   cancel: string;
+  confirmCancelOrder: string;
+  cancelOrder: string;
 
   // Customer interface
   availableDrinks: string;
@@ -134,6 +136,8 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     showRecipeHelp: "When enabled, guests can see the full recipe. When disabled, they only see the guest description (if provided).",
     save: "Save",
     cancel: "Cancel",
+    confirmCancelOrder: "Are you sure you want to cancel your order?",
+    cancelOrder: "Cancel Order",
 
     // Customer interface
     availableDrinks: "Available Drinks",
@@ -222,6 +226,8 @@ export const translations: { en: TranslationMap; da: TranslationMap } = {
     showRecipeHelp: "Når aktiveret, kan gæster se den fulde opskrift. Når deaktiveret, ser de kun gæste beskrivelsen (hvis angivet).",
     save: "Gem",
     cancel: "Annuller",
+    confirmCancelOrder: "Er du sikker på, at du vil annullere din bestilling?",
+    cancelOrder: "Annuller bestilling",
 
     // Customer interface
     availableDrinks: "Tilgængelige Drinks",

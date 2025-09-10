@@ -167,6 +167,31 @@ const CustomerInterface: React.FC = () => {
     }
   };
 
+    const handleCancelOrder = async (orderId: number) => {
+    if (!currentBar || !customerName) return;
+    
+    const confirmCancel = window.confirm(t("confirmCancelOrder"));
+    if (!confirmCancel) return;
+    
+    setLoading(true);
+    try {
+      await apiCall(`/orders/${orderId}`, {
+        method: "DELETE",
+        body: JSON.stringify({
+          barId: currentBar.id,
+          customerName: customerName,
+        }),
+      });
+      
+      // Refresh orders after canceling
+      await fetchOrders();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to cancel order");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Helper to get all in-stock drinks
   const allInStockDrinks = drinks.filter((d) => d.in_stock);
 
@@ -390,6 +415,8 @@ const CustomerInterface: React.FC = () => {
               t={t}
               getStatusIcon={getStatusIcon}
               getStatusColor={getStatusColor}
+              onCancelOrder={handleCancelOrder}
+              loading={loading}
             />
           )}
 
