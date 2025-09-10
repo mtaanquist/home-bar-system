@@ -32,19 +32,32 @@ const CustomerInterface: React.FC = () => {
   // Restore state for random drink modal
   const [randomDrink, setRandomDrink] = useState<Drink | null>(null);
   const [showRandomModal, setShowRandomModal] = useState(false);
+  
+  // Favourites state
+  const [favouriteDrinks, setFavouriteDrinks] = useState<Drink[]>([]);
 
   // Tab state for mobile - no longer needed since we navigate to separate page
   // const [mobileTab, setMobileTab] = useState<"menu" | "history">("menu");
 
   // Data fetching
   const fetchDrinks = async () => {
-    if (!currentBar) return;
+    if (!currentBar || !customerName) return;
     try {
-      // Use guest endpoint to get drinks with proper filtering
-      const data = await apiCall(`/drinks/bar/${currentBar.id}/guest`);
+      // Use guest endpoint with customer name to get drinks with favourite status
+      const data = await apiCall(`/drinks/bar/${currentBar.id}/guest/${encodeURIComponent(customerName)}`);
       setDrinks(data);
     } catch (err) {
       console.error("Error fetching drinks:", err);
+    }
+  };
+
+  const fetchFavourites = async () => {
+    if (!currentBar || !customerName) return;
+    try {
+      const data = await apiCall(`/drinks/bar/${currentBar.id}/favourites/${encodeURIComponent(customerName)}`);
+      setFavouriteDrinks(data);
+    } catch (err) {
+      console.error("Error fetching favourites:", err);
     }
   };
 
@@ -59,11 +72,12 @@ const CustomerInterface: React.FC = () => {
   };
 
   useEffect(() => {
-    if (currentBar) {
+    if (currentBar && customerName) {
       fetchDrinks();
+      fetchFavourites();
       fetchOrders();
     }
-  }, [currentBar]);
+  }, [currentBar, customerName]);
 
   // Get customer's current order
   const customerOrder = orders.find(
@@ -118,6 +132,38 @@ const CustomerInterface: React.FC = () => {
       setError(err instanceof Error ? err.message : "Failed to place order");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleFavourite = async (drink: Drink) => {
+    if (!currentBar || !customerName) return;
+    
+    try {
+      if (drink.is_favourite) {
+        // Remove from favourites
+        await apiCall(`/drinks/bar/${currentBar.id}/favourites`, {
+          method: "DELETE",
+          body: JSON.stringify({
+            customerName,
+            drinkId: drink.id,
+          }),
+        });
+      } else {
+        // Add to favourites
+        await apiCall(`/drinks/bar/${currentBar.id}/favourites`, {
+          method: "POST",
+          body: JSON.stringify({
+            customerName,
+            drinkId: drink.id,
+          }),
+        });
+      }
+      
+      // Refresh drinks and favourites
+      await fetchDrinks();
+      await fetchFavourites();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update favourites");
     }
   };
 
@@ -305,6 +351,16 @@ const CustomerInterface: React.FC = () => {
                 🎲 {t("surpriseMe")}
               </button>
             </li>
+            {favouriteDrinks.length > 0 && (
+              <li>
+                <a
+                  href="#favourites"
+                  className="block px-3 py-2 rounded hover:bg-yellow-100 text-yellow-700 font-medium"
+                >
+                  ⭐ {t("favourites")} ({favouriteDrinks.length})
+                </a>
+              </li>
+            )}
             {spiritsWithDrinks.map((spirit) => (
               <li key={spirit}>
                 <a
@@ -340,36 +396,65 @@ const CustomerInterface: React.FC = () => {
           {/* Past Orders Section - removed since it's now a separate page */}
 
           {/* Grouped Available Drinks */}
-          {spiritsWithDrinks.length === 0 ? (
+          {spiritsWithDrinks.length === 0 && favouriteDrinks.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <Coffee className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p>No drinks available right now</p>
             </div>
           ) : (
-            spiritsWithDrinks.map((spirit) => (
-              <section
-                key={spirit}
-                id={`spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
-                className="scroll-mt-24"
-              >
-                <h2 className="text-2xl font-bold text-blue-800 mb-4">
-                  {spirit}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {groupedDrinks[spirit].map((drink) => (
-                    <DrinkCard
-                      key={drink.id}
-                      drink={drink}
-                      onViewRecipe={setViewingRecipe}
-                      onOrder={handlePlaceOrder}
-                      disabled={!!customerOrder || loading}
-                      loading={loading}
-                      t={t}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))
+            <>
+              {/* Favourites Section */}
+              {favouriteDrinks.length > 0 && (
+                <section
+                  id="favourites"
+                  className="scroll-mt-24"
+                >
+                  <h2 className="text-2xl font-bold text-yellow-700 mb-4">
+                    ⭐ {t("favourites")}
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    {favouriteDrinks.map((drink) => (
+                      <DrinkCard
+                        key={drink.id}
+                        drink={{ ...drink, is_favourite: true }}
+                        onViewRecipe={setViewingRecipe}
+                        onOrder={handlePlaceOrder}
+                        onToggleFavourite={handleToggleFavourite}
+                        disabled={!!customerOrder || loading}
+                        loading={loading}
+                        t={t}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
+              
+              {spiritsWithDrinks.map((spirit) => (
+                <section
+                  key={spirit}
+                  id={`spirit-${spirit.replace(/[^a-zA-Z0-9]/g, "")}`}
+                  className="scroll-mt-24"
+                >
+                  <h2 className="text-2xl font-bold text-blue-800 mb-4">
+                    {spirit}
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {groupedDrinks[spirit].map((drink) => (
+                      <DrinkCard
+                        key={drink.id}
+                        drink={drink}
+                        onViewRecipe={setViewingRecipe}
+                        onOrder={handlePlaceOrder}
+                        onToggleFavourite={handleToggleFavourite}
+                        disabled={!!customerOrder || loading}
+                        loading={loading}
+                        t={t}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </>
           )}
         </div>
       </div>

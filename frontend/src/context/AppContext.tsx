@@ -24,6 +24,7 @@ export interface Drink {
   base_spirit?: string;
   guest_description?: string;
   show_recipe_to_guests?: boolean;
+  is_favourite?: boolean; // Added for favourite status
 }
 
 export interface Order {

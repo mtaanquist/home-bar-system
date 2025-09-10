@@ -1,4 +1,5 @@
 import React from "react";
+import { Star } from "lucide-react";
 import { Drink } from "../context/AppContext";
 import { translations } from "../utils/translations";
 
@@ -6,6 +7,7 @@ interface DrinkCardProps {
   drink: Drink;
   onViewRecipe: (drink: Drink) => void;
   onOrder: (drink: Drink) => void;
+  onToggleFavourite?: (drink: Drink) => void;
   disabled: boolean;
   loading: boolean;
   t: (key: keyof typeof translations.en) => string;
@@ -15,6 +17,7 @@ const DrinkCard: React.FC<DrinkCardProps> = ({
   drink,
   onViewRecipe,
   onOrder,
+  onToggleFavourite,
   disabled,
   loading,
   t,
@@ -30,7 +33,24 @@ const DrinkCard: React.FC<DrinkCardProps> = ({
       </div>
     )}
     <div className="p-4">
-      <h3 className="font-semibold text-gray-800 mb-2">{drink.title}</h3>
+      <div className="flex items-start justify-between mb-2">
+        <h3 className="font-semibold text-gray-800 flex-1">{drink.title}</h3>
+        {onToggleFavourite && (
+          <button
+            onClick={() => onToggleFavourite(drink)}
+            className="ml-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+            title={drink.is_favourite ? "Remove from favourites" : "Add to favourites"}
+          >
+            <Star 
+              className={`w-5 h-5 transition-colors ${
+                drink.is_favourite 
+                  ? "text-yellow-500 fill-yellow-500" 
+                  : "text-gray-400 hover:text-yellow-500"
+              }`}
+            />
+          </button>
+        )}
+      </div>
       
       {/* Show guest description if available */}
       {drink.guest_description && (
